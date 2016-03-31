@@ -128,6 +128,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private string statusText = null;
 
         /// <summary>
+        /// Current hand status
+        /// </summary>
+        private bool handIsClosed = false;
+
+        /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
         public MainWindow()
@@ -321,6 +326,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             if (dataReceived)
             {
+
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {
                     // Draw a transparent background to set the render size
@@ -351,7 +357,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                 }
 
                                 DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
-                                
+
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
 
@@ -359,6 +365,19 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
+                            if (body.HandLeftState == HandState.Closed || body.HandRightState == HandState.Closed) {
+                                this.handIsClosed = true;
+                                Console.WriteLine("Hand is closed");   
+                            }
+                            else {
+                                this.handIsClosed = false;
+                                Console.WriteLine("Hand is open");
+                            }
+                            Console.WriteLine("Right X" + body.Joints[JointType.HandRight].Position.X);
+                            Console.WriteLine("Right Y" + body.Joints[JointType.HandRight].Position.Y);
+                            Console.WriteLine("Right Z" + body.Joints[JointType.HandRight].Position.Z);
+                            //Console.WriteLine("Left " + body.Joints[JointType.HandLeft].Position);
+
                         }
                     }
 
