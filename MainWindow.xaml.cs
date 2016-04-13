@@ -373,9 +373,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                 this.handIsClosed = false;
                                 Console.WriteLine("Hand is open");
                             }
-                            Console.WriteLine("Right X" + body.Joints[JointType.HandRight].Position.X);
-                            Console.WriteLine("Right Y" + body.Joints[JointType.HandRight].Position.Y);
-                            Console.WriteLine("Right Z" + body.Joints[JointType.HandRight].Position.Z);
+                            Console.WriteLine("Right X " + body.Joints[JointType.HandRight].Position.X);
+                            Console.WriteLine("Right Y " + body.Joints[JointType.HandRight].Position.Y);
+                            Console.WriteLine("Right Z " + body.Joints[JointType.HandRight].Position.Z);
                             //Console.WriteLine("Left " + body.Joints[JointType.HandLeft].Position);
 
                         }
