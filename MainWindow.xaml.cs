@@ -62,6 +62,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// </summary>
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
 
+        private readonly Brush customBrush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
+
         /// <summary>
         /// Brush used for drawing joints that are currently inferred
         /// </summary>        
@@ -103,6 +105,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private Body[] bodies = null;
 
         /// <summary>
+        /// Array for the circles
+        /// </summary>
+        private List<Point> circles;
+
+        /// <summary>
         /// definition of bones
         /// </summary>
         private List<Tuple<JointType, JointType>> bones;
@@ -127,6 +134,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// </summary>
         private string statusText = null;
 
+        private Balloon b = new Balloon(new Point(1.0, 1.0), 2.0, Color.FromArgb(128, 255, 0, 0));
+
+        private List<Balloon> balloons;
         /// <summary>
         /// Current hand status
         /// </summary>
@@ -155,6 +165,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             // a bone defined as a line between two joints
             this.bones = new List<Tuple<JointType, JointType>>();
+
+            this.circles = new List<Point>();
 
             // Torso
             //this.bones.Add(new Tuple<JointType, JointType>(JointType.Head, JointType.Neck));
@@ -316,6 +328,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                         this.bodies = new Body[bodyFrame.BodyCount];
                     }
 
+                    if (this.circles == null)
+                    {
+                        this.circles = new 
+                    }
                     // The first time GetAndRefreshBodyData is called, Kinect will allocate each Body in the array.
                     // As long as those body objects are not disposed and not set to null in the array,
                     // those body objects will be re-used.
@@ -480,6 +496,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
+                    //drawingContext.DrawEllipse(this.customBrush, null, new Point(, HandSize, HandSize);
                     break;
 
                 case HandState.Open:
@@ -544,6 +561,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             // on failure, set the status text
             this.StatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
                                                             : Properties.Resources.SensorNotAvailableStatusText;
+        }
+
+        private void readBitmap(String filePath)
+        {
+
+
         }
     }
 }
