@@ -1,6 +1,6 @@
 ﻿//------------------------------------------------------------------------------
 // <copyright file="MainWindow.xaml.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation.  All rights reserved.
+//     Copyright (c) Microsoft Corporation.  All rights reserv
 // </copyright>
 //------------------------------------------------------------------------------
 
@@ -22,6 +22,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+
+
+        private const int numberOfCirclesAcross = 10;
+        private const int numberOfCirclesDown = 10;
+
+        private double circleDiameter; 
+
         /// <summary>
         /// Radius of drawn hand circles
         /// </summary>
@@ -61,6 +68,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// Brush used for drawing joints that are currently tracked
         /// </summary>
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
+
+        private readonly Brush customBrush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
 
         /// <summary>
         /// Brush used for drawing joints that are currently inferred
@@ -103,6 +112,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private Body[] bodies = null;
 
         /// <summary>
+        /// Array for the circles
+        /// </summary>
+        private List<Point> circles;
+
+        /// <summary>
         /// definition of bones
         /// </summary>
         private List<Tuple<JointType, JointType>> bones;
@@ -127,6 +141,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// </summary>
         private string statusText = null;
 
+        private Balloon b = new Balloon(new Point(1.0, 1.0), 2.0, Color.FromArgb(128, 255, 0, 0));
+
+        private List<Balloon> balloons;
         /// <summary>
         /// Current hand status
         /// </summary>
@@ -155,6 +172,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             // a bone defined as a line between two joints
             this.bones = new List<Tuple<JointType, JointType>>();
+
+            this.circles = new List<Point>();
 
             // Torso
             //this.bones.Add(new Tuple<JointType, JointType>(JointType.Head, JointType.Neck));
@@ -316,6 +335,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                         this.bodies = new Body[bodyFrame.BodyCount];
                     }
 
+                    if (this.circles == null)
+                    {
+                        //this.circles = new 
+                    }
                     // The first time GetAndRefreshBodyData is called, Kinect will allocate each Body in the array.
                     // As long as those body objects are not disposed and not set to null in the array,
                     // those body objects will be re-used.
@@ -329,6 +352,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {
+                   
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
 
@@ -360,12 +384,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
-
+                            //Draw Gird
+                            drawCircleGrid(dc);
                             this.DrawBody(joints, jointPoints, dc, drawPen);
 
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
-                            this.drawCircles(body.HandRightState, jointPoints[JointType.HandRight], dc);
+                            //this.drawCircles(body.HandRightState, jointPoints[JointType.HandRight], dc);
                             if (body.HandLeftState == HandState.Closed || body.HandRightState == HandState.Closed) {
                                 this.handIsClosed = true;
                                 Console.WriteLine("Hand is closed");   
@@ -469,18 +494,56 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             drawingContext.DrawLine(drawPen, jointPoints[jointType0], jointPoints[jointType1]);
         }
 
+
+        //Draw Circle 
+        private void drawCircle( DrawingContext drawingContext, double x , double y , double diameter)
+        {
+            drawingContext.DrawEllipse( Brushes.Yellow, null , new Point(x, y) ,     25,  25);
+
+        }
+
+
+        //Draw the backGround circles 
+        public void drawCircleGrid(DrawingContext drawingContext)
+        {
+            //DrawCricles Across 
+            circleDiameter = this.displayWidth / numberOfCirclesAcross;
+
+            //Draw Circles down 
+            double y = circleDiameter / 2;
+            while (y < this.displayHeight)
+            {
+                double x = circleDiameter / 2;
+                while (x < this.displayWidth)
+                {
+                    drawCircle(drawingContext, x, y, circleDiameter);
+                    x += circleDiameter;
+                }
+
+                y += circleDiameter;
+
+            }
+        }
+
         /// <summary>
         /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
         /// </summary>
         /// <param name="handState">state of the hand</param>
         /// <param name="handPosition">position of the hand</param>
         /// <param name="drawingContext">drawing context to draw to</param>
+        /// 
+        
+
         private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
         {
+          
+
+
             switch (handState)
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
+                    drawCircle(drawingContext, handPosition.X, handPosition.Y , 25);
                     break;
 
                 case HandState.Open:
@@ -547,20 +610,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                                             : Properties.Resources.SensorNotAvailableStatusText;
         }
 
-        private void drawCircles(HandState handState, Point handPosition, DrawingContext drawingContext)
-        {
-            //CameraSpacePoint position = new CameraSpacePoint(0, 0, 0);
-
-            //DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
-
-            //jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
-
-            //circlePoints.Add(handPosition);
-            //for (int i = 0; i < circlePoints.Count; i++)
-            //{
-            //    drawingContext.DrawEllipse(Brushes.Aqua, null, circlePoints[i], HandSize, HandSize);
-            //}
-        }
         private Balloon detectHit(double x, double y)
         {
             for(int i = 0; i < balloons.Count; i++)
@@ -577,7 +626,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
             return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
         }
-        //private List<Point> balloonPoints = new List<Point>();
-        private List<Balloon> balloons = new List<Balloon>();
+
+        private void readBitmap(String filePath)
+        {
+
+
+        }
+
     }
 }
