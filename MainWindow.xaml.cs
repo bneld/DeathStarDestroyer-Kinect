@@ -365,6 +365,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
+                            this.drawCircles(body.HandRightState, jointPoints[JointType.HandRight], dc);
                             if (body.HandLeftState == HandState.Closed || body.HandRightState == HandState.Closed) {
                                 this.handIsClosed = true;
                                 Console.WriteLine("Hand is closed");   
@@ -545,5 +546,38 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.StatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
                                                             : Properties.Resources.SensorNotAvailableStatusText;
         }
+
+        private void drawCircles(HandState handState, Point handPosition, DrawingContext drawingContext)
+        {
+            //CameraSpacePoint position = new CameraSpacePoint(0, 0, 0);
+
+            //DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
+
+            //jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
+
+            //circlePoints.Add(handPosition);
+            //for (int i = 0; i < circlePoints.Count; i++)
+            //{
+            //    drawingContext.DrawEllipse(Brushes.Aqua, null, circlePoints[i], HandSize, HandSize);
+            //}
+        }
+        private Balloon detectHit(double x, double y)
+        {
+            for(int i = 0; i < balloons.Count; i++)
+            {
+                Point p = balloons[i].getPoint();
+                if(distance(x, y, p.X, p.Y) <= circleDiameter)
+                {
+                    return balloons[i];
+                }
+            }
+            return null;
+        }
+        private double distance(double x1, double y1, double x2, double y2)
+        {
+            return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
+        }
+        //private List<Point> balloonPoints = new List<Point>();
+        private List<Balloon> balloons = new List<Balloon>();
     }
 }
