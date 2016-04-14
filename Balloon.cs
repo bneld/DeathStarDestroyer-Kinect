@@ -14,8 +14,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private double diameter;
         private Boolean exploded;
 
-        public Balloon(Point location, double diameter, Boolean exploded){
-            this.location = location;
+        public Balloon(Point xlocation, double diameter, Boolean exploded){
+            this.location = xlocation;
             this.diameter = diameter;
             
             this.exploded = exploded;

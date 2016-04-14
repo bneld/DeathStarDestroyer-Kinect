@@ -26,7 +26,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         private const int numberOfCirclesAcross = 10;
         private const int numberOfCirclesDown = 10;
-        static List<Balloon> backgorundBalloons; 
+        static List<Balloon> backgroundBalloons; 
 
         private double circleDiameter; 
 
@@ -392,6 +392,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
+                            //this.drawCircles(body.HandRightState, jointPoints[JointType.HandRight], dc);
                             if (body.HandLeftState == HandState.Closed || body.HandRightState == HandState.Closed) {
                                 this.handIsClosed = true;
                                 Console.WriteLine("Hand is closed");   
@@ -400,9 +401,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                 this.handIsClosed = false;
                                 Console.WriteLine("Hand is open");
                             }
-                            Console.WriteLine("Right X" + body.Joints[JointType.HandRight].Position.X);
-                            Console.WriteLine("Right Y" + body.Joints[JointType.HandRight].Position.Y);
-                            Console.WriteLine("Right Z" + body.Joints[JointType.HandRight].Position.Z);
+                            Console.WriteLine("Right X " + body.Joints[JointType.HandRight].Position.X);
+                            Console.WriteLine("Right Y " + body.Joints[JointType.HandRight].Position.Y);
+                            Console.WriteLine("Right Z " + body.Joints[JointType.HandRight].Position.Z);
                             //Console.WriteLine("Left " + body.Joints[JointType.HandLeft].Position);
 
                         }
@@ -497,17 +498,17 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 
         //Draw Circle 
-        private void drawCircle( DrawingContext drawingContext, double x , double y , double diameter)
+        private void drawCircle( Brush b,  DrawingContext drawingContext, double x , double y , double diameter)
         {
-            drawingContext.DrawEllipse( Brushes.Yellow, null , new Point(x, y) ,     25,  25);
-            
+            drawingContext.DrawEllipse( b, null , new Point(x, y) ,     25,  25);
+             
         }
 
 
         //Create Balloon objects the backGround circles 
         public void createCircleGrid()
         {
-            backgorundBalloons = new List<Balloon>(); 
+            backgroundBalloons = new List<Balloon>(); 
 
             //DrawCricles Across 
             circleDiameter = this.displayWidth / numberOfCirclesAcross;
@@ -519,7 +520,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 double x = circleDiameter / 2;
                 while (x < this.displayWidth)
                 {
-                    backgorundBalloons.Add(new Balloon(new Point(x, y), circleDiameter, false));
+                    backgroundBalloons.Add(new Balloon(new Point(x, y), circleDiameter, false));
                    
                     x += circleDiameter;
                 }
@@ -532,10 +533,15 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         //Draw Ballons in balloon list 
         public void drawCircleGrid(DrawingContext dr)
         {
-            for(int i =0; i < backgorundBalloons.Count; i++)
+            //Console.Clear();
+
+
+            for(int i =0; i < backgroundBalloons.Count; i++)
             {
-               if(backgorundBalloons[i].getExploded() == false) drawCircle(dr, backgorundBalloons[i].getXLocation(), backgorundBalloons[i].getYLocation(), backgorundBalloons[i].getDiameter());
-             }
+                if (backgroundBalloons[i].getExploded() == false) drawCircle( Brushes.Yellow , dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
+
+                else drawCircle(Brushes.Red , dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
+            }
         }
         
         /// <summary>
@@ -556,11 +562,17 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
-                    drawCircle(drawingContext, handPosition.X, handPosition.Y , 25);
+                    drawCircle(Brushes.Blue, drawingContext, handPosition.X, handPosition.Y , 25);
+                    detectHit(handPosition.X, handPosition.Y);
+                  
+
+                    drawCircleGrid(drawingContext);
                     break;
 
                 case HandState.Open:
                     drawingContext.DrawEllipse(this.handOpenBrush, null, handPosition, HandSize, HandSize);
+                    
+
                     break;
 
                 case HandState.Lasso:
@@ -623,10 +635,31 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                                             : Properties.Resources.SensorNotAvailableStatusText;
         }
 
+        private Balloon detectHit(double x, double y)
+        {
+            for(int i = 0; i < backgroundBalloons.Count; i++)
+            {
+                double pX = backgroundBalloons[i].getXLocation();
+                double pY = backgroundBalloons[i].getYLocation(); 
+                if(distance(x, y, pX, pY) <= circleDiameter / 2)
+                {
+                    Console.WriteLine("Distance: " + distance(x, y, pX, pY) + "  || + Diameter: " + circleDiameter / 2);
+                    backgroundBalloons[i].setExploded(true);
+                    
+                }
+            }
+            return null;
+        }
+        private double distance(double x1, double y1, double x2, double y2)
+        {
+            return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
+        }
+
         private void readBitmap(String filePath)
         {
 
 
         }
+
     }
 }
