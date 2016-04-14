@@ -12,19 +12,23 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     {
         private Point location;
         private double diameter;
-        private Color color;
         private Boolean exploded;
 
-        public Balloon(Point location, double diameter, Color color){
+        public Balloon(Point location, double diameter, Boolean exploded){
             this.location = location;
             this.diameter = diameter;
-            this.color = color;
-            this.exploded = true;
+            
+            this.exploded = exploded;
         }
 
-        public Point getPoint()
+        public double getXLocation()
         {
-            return location;
+            return location.X;
+        }
+
+        public double getYLocation()
+        {
+            return location.Y;
         }
 
         public double getDiameter()
@@ -41,12 +45,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
             location = p;
         }
-
-        public void setColor(Color c)
-        {
-            color = c;
-        }
-
+        
         public void setDiameter(double d)
         {
             diameter = d;

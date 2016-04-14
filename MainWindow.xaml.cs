@@ -26,6 +26,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         private const int numberOfCirclesAcross = 10;
         private const int numberOfCirclesDown = 10;
+        static List<Balloon> backgorundBalloons; 
 
         private double circleDiameter; 
 
@@ -141,7 +142,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// </summary>
         private string statusText = null;
 
-        private Balloon b = new Balloon(new Point(1.0, 1.0), 2.0, Color.FromArgb(128, 255, 0, 0));
+       // private Balloon b = new Balloon(new Point(1.0, 1.0), 2.0, Color.FromArgb(128, 255, 0, 0));
 
         private List<Balloon> balloons;
         /// <summary>
@@ -337,7 +338,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                     if (this.circles == null)
                     {
-                        this.circles = new 
+                        //this.circles = new 
                     }
                     // The first time GetAndRefreshBodyData is called, Kinect will allocate each Body in the array.
                     // As long as those body objects are not disposed and not set to null in the array,
@@ -385,6 +386,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
                             //Draw Gird
+                            createCircleGrid();
                             drawCircleGrid(dc);
                             this.DrawBody(joints, jointPoints, dc, drawPen);
 
@@ -498,13 +500,15 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private void drawCircle( DrawingContext drawingContext, double x , double y , double diameter)
         {
             drawingContext.DrawEllipse( Brushes.Yellow, null , new Point(x, y) ,     25,  25);
-
+            
         }
 
 
-        //Draw the backGround circles 
-        public void drawCircleGrid(DrawingContext drawingContext)
+        //Create Balloon objects the backGround circles 
+        public void createCircleGrid()
         {
+            backgorundBalloons = new List<Balloon>(); 
+
             //DrawCricles Across 
             circleDiameter = this.displayWidth / numberOfCirclesAcross;
 
@@ -515,7 +519,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 double x = circleDiameter / 2;
                 while (x < this.displayWidth)
                 {
-                    drawCircle(drawingContext, x, y, circleDiameter);
+                    backgorundBalloons.Add(new Balloon(new Point(x, y), circleDiameter, false));
+                   
                     x += circleDiameter;
                 }
 
@@ -524,6 +529,15 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
+        //Draw Ballons in balloon list 
+        public void drawCircleGrid(DrawingContext dr)
+        {
+            for(int i =0; i < backgorundBalloons.Count; i++)
+            {
+               if(backgorundBalloons[i].getExploded() == false) drawCircle(dr, backgorundBalloons[i].getXLocation(), backgorundBalloons[i].getYLocation(), backgorundBalloons[i].getDiameter());
+             }
+        }
+        
         /// <summary>
         /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
         /// </summary>
