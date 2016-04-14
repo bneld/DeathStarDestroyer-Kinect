@@ -1,6 +1,6 @@
 ﻿//------------------------------------------------------------------------------
 // <copyright file="MainWindow.xaml.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation.  All rights reserved.
+//     Copyright (c) Microsoft Corporation.  All rights reserv
 // </copyright>
 //------------------------------------------------------------------------------
 
@@ -22,6 +22,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+
+
+        private const int numberOfCirclesAcross = 10;
+        private const int numberOfCirclesDown = 10;
+
+        private double circleDiameter; 
+
         /// <summary>
         /// Radius of drawn hand circles
         /// </summary>
@@ -345,6 +352,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {
+                   
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
 
@@ -376,7 +384,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
-
+                            //Draw Gird
+                            drawCircleGrid(dc);
                             this.DrawBody(joints, jointPoints, dc, drawPen);
 
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
@@ -484,19 +493,56 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             drawingContext.DrawLine(drawPen, jointPoints[jointType0], jointPoints[jointType1]);
         }
 
+
+        //Draw Circle 
+        private void drawCircle( DrawingContext drawingContext, double x , double y , double diameter)
+        {
+            drawingContext.DrawEllipse( Brushes.Yellow, null , new Point(x, y) ,     25,  25);
+
+        }
+
+
+        //Draw the backGround circles 
+        public void drawCircleGrid(DrawingContext drawingContext)
+        {
+            //DrawCricles Across 
+            circleDiameter = this.displayWidth / numberOfCirclesAcross;
+
+            //Draw Circles down 
+            double y = circleDiameter / 2;
+            while (y < this.displayHeight)
+            {
+                double x = circleDiameter / 2;
+                while (x < this.displayWidth)
+                {
+                    drawCircle(drawingContext, x, y, circleDiameter);
+                    x += circleDiameter;
+                }
+
+                y += circleDiameter;
+
+            }
+        }
+
         /// <summary>
         /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
         /// </summary>
         /// <param name="handState">state of the hand</param>
         /// <param name="handPosition">position of the hand</param>
         /// <param name="drawingContext">drawing context to draw to</param>
+        /// 
+        
+
         private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
         {
+          
+
+
             switch (handState)
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
-                    //drawingContext.DrawEllipse(this.customBrush, null, new Point(, HandSize, HandSize);
+                    drawCircle(drawingContext, handPosition.X, handPosition.Y , 25);
                     break;
 
                 case HandState.Open:
