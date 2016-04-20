@@ -241,6 +241,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             // initialize the components (controls) of the window
             this.InitializeComponent();
+
+            //Create the grid of Balloons
+            createCircleGrid();
         }
 
         /// <summary>
@@ -385,8 +388,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
-                            //Draw Gird
-                            createCircleGrid();
+                            
                             drawCircleGrid(dc);
                             this.DrawBody(joints, jointPoints, dc, drawPen);
 
