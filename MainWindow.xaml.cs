@@ -22,8 +22,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-
-
+        
         private const int numberOfCirclesAcross = 10;
         private const int numberOfCirclesDown = 10;
         static List<Balloon> backgroundBalloons; 
@@ -155,6 +154,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// </summary>
         public MainWindow()
         {
+        
             // one sensor is currently supported
             this.kinectSensor = KinectSensor.GetDefault();
 
@@ -387,6 +387,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                             //Draw Gird
                             createCircleGrid();
                             drawCircleGrid(dc);
+                            dc.DrawRectangle(Brushes.Red, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
                             this.DrawBody(joints, jointPoints, dc, drawPen);
 
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
@@ -574,6 +575,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 case HandState.Lasso:
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
+                   
                     break;
             }
         }
