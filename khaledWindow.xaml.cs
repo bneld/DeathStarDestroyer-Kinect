@@ -1,160 +1,58 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="MainWindow.xaml.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation.  All rights reserv
-// </copyright>
-//------------------------------------------------------------------------------
+﻿using Microsoft.Kinect;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace Microsoft.Samples.Kinect.BodyBasics
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.IO;
-    using System.Windows;
-    using System.Windows.Media;
-    using System.Windows.Media.Imaging;
-    using Microsoft.Kinect;
-
     /// <summary>
-    /// Interaction logic for MainWindow
+    /// Interaction logic for khaledWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class khaledWindow : Window , INotifyPropertyChanged
     {
-        
         private const int numberOfCirclesAcross = 10;
         private const int numberOfCirclesDown = 10;
-        static List<Balloon> backgroundBalloons; 
+        static List<Balloon> backgroundBalloons;
 
-        private double circleDiameter; 
-
-        /// <summary>
-        /// Radius of drawn hand circles
-        /// </summary>
+        private double circleDiameter;
         private const double HandSize = 30;
-
-        /// <summary>
-        /// Thickness of drawn joint lines
-        /// </summary>
         private const double JointThickness = 3;
-
-        /// <summary>
-        /// Thickness of clip edge rectangles
-        /// </summary>
         private const double ClipBoundsThickness = 10;
-
-        /// <summary>
-        /// Constant for clamping Z values of camera space points from being negative
-        /// </summary>
         private const float InferredZPositionClamp = 0.1f;
-
-        /// <summary>
-        /// Brush used for drawing hands that are currently tracked as closed
-        /// </summary>
         private readonly Brush handClosedBrush = new SolidColorBrush(Color.FromArgb(128, 255, 0, 0));
-
-        /// <summary>
-        /// Brush used for drawing hands that are currently tracked as opened
-        /// </summary>
         private readonly Brush handOpenBrush = new SolidColorBrush(Color.FromArgb(128, 0, 255, 0));
-
-        /// <summary>
-        /// Brush used for drawing hands that are currently tracked as in lasso (pointer) position
-        /// </summary>
         private readonly Brush handLassoBrush = new SolidColorBrush(Color.FromArgb(128, 0, 0, 255));
-
-        /// <summary>
-        /// Brush used for drawing joints that are currently tracked
-        /// </summary>
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
-
         private readonly Brush customBrush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
-
-        /// <summary>
-        /// Brush used for drawing joints that are currently inferred
-        /// </summary>        
         private readonly Brush inferredJointBrush = Brushes.Yellow;
-
-        /// <summary>
-        /// Pen used for drawing bones that are currently inferred
-        /// </summary>        
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
-
-        /// <summary>
-        /// Drawing group for body rendering output
-        /// </summary>
         private DrawingGroup drawingGroup;
-
-        /// <summary>
-        /// Drawing image that we will display
-        /// </summary>
         private DrawingImage imageSource;
-
-        /// <summary>
-        /// Active Kinect sensor
-        /// </summary>
-        public KinectSensor kinectSensor = null;
-
-        /// <summary>
-        /// Coordinate mapper to map one type of point to another
-        /// </summary>
+        private KinectSensor kinectSensor = null;
         private CoordinateMapper coordinateMapper = null;
-
-        /// <summary>
-        /// Reader for body frames
-        /// </summary>
         private BodyFrameReader bodyFrameReader = null;
-
-        /// <summary>
-        /// Array for the bodies
-        /// </summary>
         private Body[] bodies = null;
-
-        /// <summary>
-        /// Array for the circles
-        /// </summary>
         private List<Point> circles;
-
-        /// <summary>
-        /// definition of bones
-        /// </summary>
         private List<Tuple<JointType, JointType>> bones;
-
-        /// <summary>
-        /// Width of display (depth space)
-        /// </summary>
         private int displayWidth;
-
-        /// <summary>
-        /// Height of display (depth space)
-        /// </summary>
         private int displayHeight;
-
-        /// <summary>
-        /// List of colors for each body tracked
-        /// </summary>
         private List<Pen> bodyColors;
-
-        /// <summary>
-        /// Current status text to display
-        /// </summary>
         private string statusText = null;
-
-       // private Balloon b = new Balloon(new Point(1.0, 1.0), 2.0, Color.FromArgb(128, 255, 0, 0));
-
         private List<Balloon> balloons;
-        /// <summary>
-        /// Current hand status
-        /// </summary>
         private bool handIsClosed = false;
-
-        /// <summary>
-        /// Initializes a new instance of the MainWindow class.
-        /// </summary>
-        public MainWindow()
+        public khaledWindow()
         {
-        
             // one sensor is currently supported
             this.kinectSensor = KinectSensor.GetDefault();
 
@@ -176,16 +74,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             this.circles = new List<Point>();
 
-            // Torso
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.Head, JointType.Neck));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.Neck, JointType.SpineShoulder));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineShoulder, JointType.SpineMid));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineMid, JointType.SpineBase));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineShoulder, JointType.ShoulderRight));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineShoulder, JointType.ShoulderLeft));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineBase, JointType.HipRight));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineBase, JointType.HipLeft));
-
             // Right Arm
             this.bones.Add(new Tuple<JointType, JointType>(JointType.ShoulderRight, JointType.ElbowRight));
             this.bones.Add(new Tuple<JointType, JointType>(JointType.ElbowRight, JointType.WristRight));
@@ -199,16 +87,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.bones.Add(new Tuple<JointType, JointType>(JointType.WristLeft, JointType.HandLeft));
             this.bones.Add(new Tuple<JointType, JointType>(JointType.HandLeft, JointType.HandTipLeft));
             this.bones.Add(new Tuple<JointType, JointType>(JointType.WristLeft, JointType.ThumbLeft));
-
-            // Right Leg
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.HipRight, JointType.KneeRight));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.KneeRight, JointType.AnkleRight));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.AnkleRight, JointType.FootRight));
-
-            // Left Leg
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.HipLeft, JointType.KneeLeft));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.KneeLeft, JointType.AnkleLeft));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.AnkleLeft, JointType.FootLeft));
 
             // populate body colors, one for each BodyIndex
             this.bodyColors = new List<Pen>();
@@ -240,19 +118,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             // initialize the components (controls) of the window
             this.InitializeComponent();
-
-            //Create the grid of Balloons
-            createCircleGrid();
         }
 
-        /// <summary>
-        /// INotifyPropertyChangedPropertyChanged event to allow window controls to bind to changeable data
-        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Gets the bitmap to display
-        /// </summary>
         public ImageSource ImageSource
         {
             get
@@ -260,10 +128,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 return this.imageSource;
             }
         }
-
-        /// <summary>
-        /// Gets or sets the current status text to display
-        /// </summary>
         public string StatusText
         {
             get
@@ -286,12 +150,16 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
-        /// Execute start up tasks
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        //Handles when the sensor becomes unavaliable 
+        private void Sensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
+        {
+            // on failure, set the status text
+            this.StatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
+                                                            : Properties.Resources.SensorNotAvailableStatusText;
+        }
+
+        //Excute start up tasks 
+        private void khaledWindow_Loaded(object sender, RoutedEventArgs e)
         {
             if (this.bodyFrameReader != null)
             {
@@ -299,12 +167,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
-        /// Execute shutdown tasks
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
-        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        //Excuting Shutdown
+        private void khaledWindow_Closing(object sender, CancelEventArgs e)
         {
             if (this.bodyFrameReader != null)
             {
@@ -320,11 +184,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
-        /// Handles the body frame data arriving from the sensor
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
+
+        //Handling data body frame data arriving from sensor
         private void Reader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
             bool dataReceived = false;
@@ -355,7 +216,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {
-                    
+
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
 
@@ -387,25 +248,27 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
-                            
-                            drawCircleGrid(dc);
-                            dc.DrawRectangle(Brushes.Red, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
+                            //Draw Gird
+                      //      createCircleGrid();
+                    //         drawCircleGrid(dc);
                             this.DrawBody(joints, jointPoints, dc, drawPen);
 
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
                             //this.drawCircles(body.HandRightState, jointPoints[JointType.HandRight], dc);
-                            if (body.HandLeftState == HandState.Closed || body.HandRightState == HandState.Closed) {
+                            if (body.HandLeftState == HandState.Closed || body.HandRightState == HandState.Closed)
+                            {
                                 this.handIsClosed = true;
-                                Console.WriteLine("Hand is closed");   
+                                Console.WriteLine("Hand is closed");
                             }
-                            else {
+                            else
+                            {
                                 this.handIsClosed = false;
                                 Console.WriteLine("Hand is open");
                             }
-                            Console.WriteLine("Right X " + body.Joints[JointType.HandRight].Position.X);
-                            Console.WriteLine("Right Y " + body.Joints[JointType.HandRight].Position.Y);
-                            Console.WriteLine("Right Z " + body.Joints[JointType.HandRight].Position.Z);
+                            Console.WriteLine("KHALED WINDOW");
+                            //Console.WriteLine("Right Y " + body.Joints[JointType.HandRight].Position.Y);
+                            //Console.WriteLine("Right Z " + body.Joints[JointType.HandRight].Position.Z);
                             //Console.WriteLine("Left " + body.Joints[JointType.HandLeft].Position);
 
                         }
@@ -417,13 +280,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
-        /// Draws a body
-        /// </summary>
-        /// <param name="joints">joints to draw</param>
-        /// <param name="jointPoints">translated positions of joints to draw</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
-        /// <param name="drawingPen">specifies color to draw a specific body</param>
+        //Draw Body 
         private void DrawBody(IReadOnlyDictionary<JointType, Joint> joints, IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen drawingPen)
         {
             // Draw the bones
@@ -435,15 +292,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             // Draw the joints
             foreach (JointType jointType in joints.Keys)
             {
-                // Right Leg
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.HipRight, JointType.KneeRight));
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.KneeRight, JointType.AnkleRight));
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.AnkleRight, JointType.FootRight));
-
-                // Left Leg
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.HipLeft, JointType.KneeLeft));
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.KneeLeft, JointType.AnkleLeft));
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.AnkleLeft, JointType.FootLeft));
+                
                 if (!jointType.Equals(JointType.KneeLeft) && !jointType.Equals(JointType.KneeRight) && !jointType.Equals(JointType.AnkleLeft) && !jointType.Equals(JointType.AnkleRight) && !jointType.Equals(JointType.FootRight) && !jointType.Equals(JointType.FootLeft) && !jointType.Equals(JointType.Head) && !jointType.Equals(JointType.Neck) && !jointType.Equals(JointType.SpineShoulder) && !jointType.Equals(JointType.SpineMid) && !jointType.Equals(JointType.SpineBase) && !jointType.Equals(JointType.HipRight) && !jointType.Equals(JointType.HipLeft))
                 {
                     Brush drawBrush = null;
@@ -467,15 +316,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
-        /// Draws one bone of a body (joint to joint)
-        /// </summary>
-        /// <param name="joints">joints to draw</param>
-        /// <param name="jointPoints">translated positions of joints to draw</param>
-        /// <param name="jointType0">first joint of bone to draw</param>
-        /// <param name="jointType1">second joint of bone to draw</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
-        /// /// <param name="drawingPen">specifies color to draw a specific bone</param>
+        //Draw Bone - Joint to joint
         private void DrawBone(IReadOnlyDictionary<JointType, Joint> joints, IDictionary<JointType, Point> jointPoints, JointType jointType0, JointType jointType1, DrawingContext drawingContext, Pen drawingPen)
         {
             Joint joint0 = joints[jointType0];
@@ -498,95 +339,33 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             drawingContext.DrawLine(drawPen, jointPoints[jointType0], jointPoints[jointType1]);
         }
 
-
-        //Draw Circle 
-        private void drawCircle( Brush b,  DrawingContext drawingContext, double x , double y , double diameter)
-        {
-            drawingContext.DrawEllipse( b, null , new Point(x, y) ,     25,  25);
-             
-        }
-
-
-        //Create Balloon objects the backGround circles 
-        public void createCircleGrid()
-        {
-            backgroundBalloons = new List<Balloon>(); 
-
-            //DrawCricles Across 
-            circleDiameter = this.displayWidth / numberOfCirclesAcross;
-
-            //Draw Circles down 
-            double y = circleDiameter / 2;
-            while (y < this.displayHeight)
-            {
-                double x = circleDiameter / 2;
-                while (x < this.displayWidth)
-                {
-                    backgroundBalloons.Add(new Balloon(new Point(x, y), circleDiameter, false));
-                   
-                    x += circleDiameter;
-                }
-
-                y += circleDiameter;
-
-            }
-        }
-
-        //Draw Ballons in balloon list 
-        public void drawCircleGrid(DrawingContext dr)
-        {
-            //Console.Clear();
-
-
-            for(int i =0; i < backgroundBalloons.Count; i++)
-            {
-                if (backgroundBalloons[i].getExploded() == false) drawCircle( Brushes.Yellow , dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
-
-                else drawCircle(Brushes.Red , dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
-            }
-        }
-        
-        /// <summary>
-        /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
-        /// </summary>
-        /// <param name="handState">state of the hand</param>
-        /// <param name="handPosition">position of the hand</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
-        /// 
-        
-
+        //Draw Hand + What to DO !!!!!!!
         private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
         {
-          
+
 
 
             switch (handState)
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
-                    drawCircle(Brushes.Blue, drawingContext, handPosition.X, handPosition.Y , 25);
-                    detectHit(handPosition.X, handPosition.Y);
-                    drawCircleGrid(drawingContext);
+                    //   drawCircle(Brushes.Blue, drawingContext, handPosition.X, handPosition.Y, 25);
+                   // detectHit(handPosition.X, handPosition.Y);
+                   //drawCircleGrid(drawingContext);
                     break;
-
                 case HandState.Open:
                     drawingContext.DrawEllipse(this.handOpenBrush, null, handPosition, HandSize, HandSize);
-                    
+
 
                     break;
 
                 case HandState.Lasso:
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
-                   
                     break;
             }
         }
 
-        /// <summary>
-        /// Draws indicators to show which edges are clipping body data
-        /// </summary>
-        /// <param name="body">body to draw clipping information for</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
+        //Draw clippers to show witch edges are clippping user data 
         private void DrawClippedEdges(Body body, DrawingContext drawingContext)
         {
             FrameEdges clippedEdges = body.ClippedEdges;
@@ -624,43 +403,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
-        /// Handles the event which the sensor becomes unavailable (E.g. paused, closed, unplugged).
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
-        private void Sensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
-        {
-            // on failure, set the status text
-            this.StatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
-                                                            : Properties.Resources.SensorNotAvailableStatusText;
-        }
+        
 
-        private Balloon detectHit(double x, double y)
-        {
-            for(int i = 0; i < backgroundBalloons.Count; i++)
-            {
-                double pX = backgroundBalloons[i].getXLocation();
-                double pY = backgroundBalloons[i].getYLocation(); 
-                if(distance(x, y, pX, pY) <= circleDiameter / 2)
-                {
-                    Console.WriteLine("Distance: " + distance(x, y, pX, pY) + "  || + Diameter: " + circleDiameter / 2);
-                    backgroundBalloons[i].setExploded(true);
-                    
-                }
-            }
-            return null;
-        }
-        private double distance(double x1, double y1, double x2, double y2)
-        {
-            return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
-        }
-
-        private void readBitmap(String filePath)
-        {
-
-
-        }
 
     }
+
+
+
+
 }
