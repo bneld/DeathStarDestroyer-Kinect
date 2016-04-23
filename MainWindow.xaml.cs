@@ -16,10 +16,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using Microsoft.Kinect;
-
-    /// <summary>
-    /// Interaction logic for MainWindow
-    /// </summary>
+    using System.Runtime.InteropServices;
+    using System.Linq;
+    using System.Windows.Controls;/// <summary>
+                                  /// Interaction logic for MainWindow
+                                  /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         
@@ -60,6 +61,19 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private bool rightHandLasso = false;
         private bool leftHandLasso = false;
 
+
+
+        //Khaled Mode Variables
+        private int k_width = 0;
+        private int k_height = 0;
+        private byte[] k_pixels = null;
+        private WriteableBitmap k_bitmap = null;
+        private ColorFrameReader k_colorReader = null;
+        private BodyFrameReader k_bodyReader = null;
+        private IList<Body> k_bodies = null;
+
+
+
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
@@ -81,22 +95,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             // open the reader for the body frames
             this.bodyFrameReader = this.kinectSensor.BodyFrameSource.OpenReader();
-
             // a bone defined as a line between two joints
             this.bones = new List<Tuple<JointType, JointType>>();
-
             this.circles = new List<Point>();
-
-            // Torso
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.Head, JointType.Neck));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.Neck, JointType.SpineShoulder));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineShoulder, JointType.SpineMid));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineMid, JointType.SpineBase));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineShoulder, JointType.ShoulderRight));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineShoulder, JointType.ShoulderLeft));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineBase, JointType.HipRight));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.SpineBase, JointType.HipLeft));
-
+            
             // Right Arm
             this.bones.Add(new Tuple<JointType, JointType>(JointType.ShoulderRight, JointType.ElbowRight));
             this.bones.Add(new Tuple<JointType, JointType>(JointType.ElbowRight, JointType.WristRight));
@@ -110,16 +112,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.bones.Add(new Tuple<JointType, JointType>(JointType.WristLeft, JointType.HandLeft));
             this.bones.Add(new Tuple<JointType, JointType>(JointType.HandLeft, JointType.HandTipLeft));
             this.bones.Add(new Tuple<JointType, JointType>(JointType.WristLeft, JointType.ThumbLeft));
-
-            // Right Leg
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.HipRight, JointType.KneeRight));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.KneeRight, JointType.AnkleRight));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.AnkleRight, JointType.FootRight));
-
-            // Left Leg
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.HipLeft, JointType.KneeLeft));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.KneeLeft, JointType.AnkleLeft));
-            //this.bones.Add(new Tuple<JointType, JointType>(JointType.AnkleLeft, JointType.FootLeft));
 
             // populate body colors, one for each BodyIndex
             this.bodyColors = new List<Pen>();
@@ -154,16 +146,38 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             //Create the grid of Balloons
             createCircleGrid();
+
+
+            //Khaled's Initializations. 
+            this.k_width = this.kinectSensor.ColorFrameSource.FrameDescription.Width;
+            this.k_height = this.kinectSensor.ColorFrameSource.FrameDescription.Height;
+
+            this.k_colorReader = this.kinectSensor.ColorFrameSource.OpenReader();
+            this.k_colorReader.FrameArrived += ColorReader_FrameArrived;
+
+            this.k_bodyReader = this.kinectSensor.BodyFrameSource.OpenReader();
+            this.k_bodyReader.FrameArrived += BodyReader_FrameArrived;
+
+            this.k_pixels = new byte[this.k_width * this.k_height * 4];
+            this.k_bitmap = new WriteableBitmap(this.k_width, this.k_height, 96.0, 96.0, PixelFormats.Bgra32, null);
+
+            this.k_bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
+
+            khaledMode.Source = this.k_bitmap;
+            khaledMode.IsEnabled = false;
+
+            khaledMode.Visibility = Visibility.Hidden;
+           
         }
 
-        /// <summary>
-        /// INotifyPropertyChangedPropertyChanged event to allow window controls to bind to changeable data
-        /// </summary>
+        
+        // INotifyPropertyChangedPropertyChanged event to allow window controls to bind to changeable data
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
-        /// <summary>
-        /// Gets the bitmap to display
-        /// </summary>
+        
+        // Gets the bitmap to display
+        
         public ImageSource ImageSource
         {
             get
@@ -210,11 +224,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
+        
         /// Execute shutdown tasks
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
+       
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             if (this.bodyFrameReader != null)
@@ -231,11 +243,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
-        /// Handles the body frame data arriving from the sensor
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
+        
+        // Handles the body frame data arriving from the sensor
+    
         private void Reader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
             bool dataReceived = false;
@@ -263,8 +273,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             if (dataReceived)
             {
-
-                using (DrawingContext dc = this.drawingGroup.Open())
+              using (DrawingContext dc = this.drawingGroup.Open())
                 {
                     
                     // Draw a transparent background to set the render size
@@ -530,7 +539,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         }
 
 
-
+        
 
 
 
@@ -564,9 +573,15 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
             if (this.bothHandsClosed == true)
             {
+
                 if (x > 50 && x < 450 && y > 10 && y < 110) return 1; // Game Option 
                 if (x > 50 && x < 450 && y > 120 && y < 220)
                 {
+                    MainMode.Visibility = Visibility.Hidden;
+                    MainMode.IsEnabled = false;
+                    khaledMode.Visibility = Visibility.Visible;
+                    khaledMode.IsEnabled = true;
+
                     Console.WriteLine("KHALED MODE");
                     return 2;
                 }
@@ -635,8 +650,14 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
 
-            if (this.rightHandLasso == true && leftHandLasso == true) this.mode = 0;
-
+            if (this.rightHandLasso == true && leftHandLasso == true)
+            {
+                this.mode = 0;
+                khaledMode.Visibility = Visibility.Hidden;
+                canvas.Children.Clear();
+                MainMode.Visibility = Visibility.Visible;
+                
+            }
             else if (this.mode == 0)//Main Menu Selection
             {
                 this.mode = checkUserSelection(rightHandPosition.X, rightHandPosition.Y);
@@ -656,6 +677,65 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             }
         }
+
+
+
+
+       ///Khaled's Methods 
+        private void ColorReader_FrameArrived(object sender, ColorFrameArrivedEventArgs e)
+        {
+            using (var frame = e.FrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    frame.CopyConvertedFrameDataToArray(this.k_pixels, ColorImageFormat.Bgra);
+
+                    this.k_bitmap.Lock();
+                    Marshal.Copy(this.k_pixels, 0, this.k_bitmap.BackBuffer, this.k_pixels.Length);
+                    this.k_bitmap.AddDirtyRect(new Int32Rect(0, 0, this.k_width, this.k_height));
+                    this.k_bitmap.Unlock();
+                }
+            }
+        }
+
+        private void BodyReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
+        {
+            using (var frame = e.FrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    frame.GetAndRefreshBodyData(this.k_bodies);
+
+                    Body body = this.k_bodies.Where(b => b.IsTracked).FirstOrDefault();
+
+                    if (body != null)
+                    {
+                        Joint handRight = body.Joints[JointType.HandRight];
+
+                        if (handRight.TrackingState != TrackingState.NotTracked)
+                        {
+                            CameraSpacePoint handRightPosition = handRight.Position;
+                            ColorSpacePoint handRightPoint = this.kinectSensor.CoordinateMapper.MapCameraPointToColorSpace(handRightPosition);
+
+                            float x = handRightPoint.X;
+                            float y = handRightPoint.Y;
+
+                            if (!float.IsInfinity(x) && !float.IsInfinity(y))
+                            {
+                                // DRAW!
+
+                                if (this.mode == 2) 
+                                    trail.Points.Add(new Point { X = x, Y = y });
+                                
+                                //Canvas.SetLeft(brush, x - brush.Width / 2.0);
+                                //Canvas.SetTop(brush, y - brush.Height);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
     }
 }
