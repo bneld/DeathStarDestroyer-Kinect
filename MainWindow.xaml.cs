@@ -25,7 +25,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         
         private const int numberOfCirclesAcross = 10;
         private const int numberOfCirclesDown = 10;
-        static List<Balloon> backgroundBalloons; 
+        static List<Balloon> backgroundBalloons;
+        private int mode = 0; // 0 for start menu , 1 for main game, 2 for khaled's mode, 3 for brian's  
 
         private double circleDiameter; 
 
@@ -359,6 +360,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
 
+                    //Draw 
+                    if (mode == 0) drawStartMenu(dc);
+                    else if (mode == 1) drawCircleGrid(dc);
+
                     int penIndex = 0;
                     foreach (Body body in this.bodies)
                     {
@@ -388,10 +393,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
                             
-                            drawCircleGrid(dc);
-                            dc.DrawRectangle(Brushes.Red, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
+                            
+                        
                             this.DrawBody(joints, jointPoints, dc, drawPen);
-
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
                             //this.drawCircles(body.HandRightState, jointPoints[JointType.HandRight], dc);
@@ -403,9 +407,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                 this.handIsClosed = false;
                                 Console.WriteLine("Hand is open");
                             }
-                            Console.WriteLine("Right X " + body.Joints[JointType.HandRight].Position.X);
-                            Console.WriteLine("Right Y " + body.Joints[JointType.HandRight].Position.Y);
-                            Console.WriteLine("Right Z " + body.Joints[JointType.HandRight].Position.Z);
+                            
                             //Console.WriteLine("Left " + body.Joints[JointType.HandLeft].Position);
 
                         }
@@ -542,10 +544,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 if (backgroundBalloons[i].getExploded() == false) drawCircle( Brushes.Yellow , dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
 
-                else drawCircle(Brushes.Red , dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
+           //     else drawCircle(Brushes.Red , dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
             }
         }
         
+    
         /// <summary>
         /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
         /// </summary>
@@ -553,20 +556,31 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// <param name="handPosition">position of the hand</param>
         /// <param name="drawingContext">drawing context to draw to</param>
         /// 
-        
-
         private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
         {
-          
-
-
-            switch (handState)
+           switch (handState)
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
                     drawCircle(Brushes.Blue, drawingContext, handPosition.X, handPosition.Y , 25);
-                    detectHit(handPosition.X, handPosition.Y);
-                    drawCircleGrid(drawingContext);
+                    if(mode == 0 )//Main Menu Selection
+                    {
+                        mode = checkUserSelection(handPosition.X, handPosition.Y);
+                    }
+                    if (mode == 1)
+                    {
+                        detectHit(handPosition.X, handPosition.Y);
+                        drawCircleGrid(drawingContext);
+                    }
+                    else if (mode ==2 )// Khaled Mode 
+                    {
+
+                    }
+
+                    else if(mode ==3)//Brian's Mode 
+                    {
+
+                    }
                     break;
 
                 case HandState.Open:
@@ -577,7 +591,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 case HandState.Lasso:
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
-                   
+                    mode = 0;
                     break;
             }
         }
@@ -662,5 +676,29 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         }
 
+        private int checkUserSelection(double x , double y )
+        {
+            if (x > 50 && x < 450 && y > 10 && y < 110) return 1; // Game Option 
+            if (x > 50 && x < 450 && y > 120 && y < 220  )
+            {
+                Console.WriteLine("KHALED MODE");
+                return 2;
+            }
+
+            if(x > 50 && x < 450 && y > 230 && y < 330)
+            {
+                Console.WriteLine("BRIAN's MODE");
+                return 3; 
+            }
+            return 0;
+        }
+
+        public void drawStartMenu(DrawingContext dc)
+        {
+            dc.DrawRectangle(Brushes.Yellow, new Pen(Brushes.Red, 6), new Rect(50, 10, 400, 100));
+            dc.DrawRectangle(Brushes.Blue, new Pen(Brushes.Red, 6), new Rect(50, 120, 400, 100));
+            dc.DrawRectangle(Brushes.Green, new Pen(Brushes.Red, 6), new Rect(50, 230, 400, 100));
+
+        }
     }
 }
