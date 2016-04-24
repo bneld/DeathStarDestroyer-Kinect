@@ -668,21 +668,36 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     if (backgroundBalloons[i].getExplosionRadius() < 200)
                     {
-                        drawExplosion(dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getExplosionRadius());
+                        drawExplosion(dr, backgroundBalloons[i]);
                         backgroundBalloons[i].increaseExplosionRadius();
+                        backgroundBalloons[i].decreaseExplosionOpacity();
                     }
                 }
 
             }
         }
-        public void drawExplosion(DrawingContext dr, double x, double y, int size)
+        public void drawExplosion(DrawingContext dr, Balloon balloon)
         {
-            GraphicsPath path = new GraphicsPath();
-            path.AddEllipse(0, 0, 140, 70);
+            double x = balloon.getXLocation();
+            double y = balloon.getYLocation();
+            int size = balloon.getExplosionRadius();
+            //GraphicsPath path = new GraphicsPath();
+            //path.AddEllipse(0, 0, 140, 70);
 
             // Use the path to construct a brush.
-            PathGradientBrush pthGrBrush = new PathGradientBrush(path);
-            dr.DrawEllipse(Brushes.Red , null, new Point(x, y), 10, 10);
+            // PathGradientBrush pthGrBrush = new PathGradientBrush(path);
+            
+            //if (size < 100)
+            //{
+                RadialGradientBrush gb = new RadialGradientBrush(Colors.Red, Colors.White);
+                gb.GradientOrigin = new Point(x, y);
+                gb.RadiusX = 30;
+                gb.RadiusY = 30;
+            //gb.Opacity = 1.0 - (size / 200);
+                gb.Opacity = balloon.getExplosionOpacity();
+                gb.Center = new Point(x, y);
+                dr.DrawEllipse(gb, null, new Point(x, y), 30, 30);
+            //}
             for (int j = 0; j < numberOfSidesOnExplosion; j++)
             {
                 dr.DrawEllipse(Brushes.Red, null, new Point(x + size*explodeXAngles[j], y + size*explodeYAngles[j]), 3, 3);
