@@ -41,8 +41,3 @@ C:\Users\khaled\Documents\workspace\Kinnnect\obj\Debug\Microsoft.Samples.Kinect.
 C:\Users\khaled\Documents\workspace\Kinnnect\obj\Debug\BodyBasics-WPF.csproj.GenerateResource.Cache
 C:\Users\khaled\Documents\workspace\Kinnnect\obj\Debug\BodyBasics-WPF.exe
 C:\Users\khaled\Documents\workspace\Kinnnect\obj\Debug\BodyBasics-WPF.pdb
-C:\Users\khaled\Documents\workspace\Kinnnect\obj\Debug\khaledWindow.g.cs
-C:\Users\khaled\Documents\workspace\Kinnnect\obj\Debug\BodyBasics-WPF_MarkupCompile.lref
-C:\Users\khaled\Documents\workspace\Kinnnect\obj\Debug\khaledWindow.baml
-C:\Users\khaled\Documents\workspace\Kinnnect\obj\Debug\startingWindow.g.cs
-C:\Users\khaled\Documents\workspace\Kinnnect\obj\Debug\startingWindow.baml
