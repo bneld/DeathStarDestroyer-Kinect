@@ -6,6 +6,8 @@
 
 namespace Microsoft.Samples.Kinect.BodyBasics
 {
+    
+   
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -24,9 +26,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     using System.Drawing.Drawing2D;
     using System.Threading.Tasks;
 
+
     /// <summary>
-                                  /// Interaction logic for MainWindow
-                                  /// </summary>
+    /// Interaction logic for MainWindow
+    /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         
@@ -82,6 +85,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private BodyFrameReader k_bodyReader = null;
         private IList<Body> k_bodies = null;
         private int kMode = 0;
+        private bool photoTaken = false; 
 
 
 
@@ -710,9 +714,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             if (this.rightHandLasso == true && this.leftHandLasso == true)
             {
                 this.mode = 0;
-                khaledMode.Visibility = Visibility.Hidden;
-                khaledLine.Points.Clear();   
-                MainMode.Visibility = Visibility.Visible;
+                this.khaledMode.Visibility = Visibility.Hidden;
+                this.khaledLine.Points.Clear();   
+                this.MainMode.Visibility = Visibility.Visible;
                 
             }
             else if (this.mode == 0)//Main Menu Selection
@@ -729,9 +733,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 if(kMode == 0)
                 {
-                    if(bothHandsClosed == true)
+                    if (this.leftHandClosed = true && this.rightHandLasso == true && this.photoTaken == false)
                     {
-                        
+                        takeScreenshot();
                     }
                 }
             }
@@ -745,8 +749,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         ///Patrick's Method
         private async void countDownTimer(DrawingContext drawingContext)
         {
-
-
+            
             String three = "3";
             String two = "2";
             String one = "1";
@@ -788,7 +791,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     Brushes.Red);
                 }
                 else if (counter == 1)
-                {
+               { 
                     formattedText = new FormattedText(
                     one,
                     CultureInfo.GetCultureInfo("en-us"),
@@ -870,6 +873,43 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 }
             }
         }
+
+
+        private void takeScreenshot()
+        {
+            if (this.k_bitmap != null)
+            {
+                // create a png bitmap encoder which knows how to save a .png file
+                BitmapEncoder encoder = new PngBitmapEncoder();
+
+                // create frame from the writable bitmap and add to encoder
+                encoder.Frames.Add(BitmapFrame.Create(this.k_bitmap));
+
+                string time = System.DateTime.UtcNow.ToString("hh'-'mm'-'ss", CultureInfo.CurrentUICulture.DateTimeFormat);
+
+                string myPhotos = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+
+                string path = Path.Combine(myPhotos, "userPhoto.png");
+
+                // write the new file to disk
+                try
+                {
+                    // FileStream is IDisposable
+                    using (FileStream fs = new FileStream(path, FileMode.Create))
+                    {
+                        encoder.Save(fs);
+                        this.photoTaken = true;
+                    }
+
+                }
+                catch (IOException)
+                {
+                  //  this.StatusText = string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedScreenshotStatusTextFormat, path);
+                }
+            }
+        }
+
+
 
 
     }
