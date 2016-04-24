@@ -704,7 +704,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     if(bothHandsClosed == true)
                     {
-                        khaledMode
+                        
                     }
                 }
             }
