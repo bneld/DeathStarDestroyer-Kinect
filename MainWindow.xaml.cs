@@ -557,9 +557,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
         {
-          
-
-
             switch (handState)
             {
                 case HandState.Closed:
@@ -571,13 +568,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 case HandState.Open:
                     drawingContext.DrawEllipse(this.handOpenBrush, null, handPosition, HandSize, HandSize);
-                    
-
                     break;
 
                 case HandState.Lasso:
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
-                   
                     break;
             }
         }
