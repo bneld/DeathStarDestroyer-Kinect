@@ -19,8 +19,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     using System.Runtime.InteropServices;
     using System.Linq;
     using System.Windows.Controls;
+
+    //using System.Drawing;
+    using System.Drawing.Drawing2D;
     using System.Threading.Tasks;
-    
+
     /// <summary>
                                   /// Interaction logic for MainWindow
                                   /// </summary>
@@ -178,6 +181,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             khaledMode.IsEnabled = false;
 
             khaledMode.Visibility = Visibility.Hidden;
+
+            //BackgroundPic.IsEnabled = false;
+            //BackgroundPic.Visibility = Visibility.Hidden;
            
         }
 
@@ -636,7 +642,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 double x = 3 * circleDiameter / 2;
                 while (x < (this.displayWidth - circleDiameter))
                 {
-                    backgroundBalloons.Add(new Balloon(new Point(x, y), circleDiameter, false));
+                    backgroundBalloons.Add(new Balloon(new System.Windows.Point(x, y), circleDiameter, false));
 
                     x += circleDiameter;
                 }
@@ -671,6 +677,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         }
         public void drawExplosion(DrawingContext dr, double x, double y, int size)
         {
+            GraphicsPath path = new GraphicsPath();
+            path.AddEllipse(0, 0, 140, 70);
+
+            // Use the path to construct a brush.
+            PathGradientBrush pthGrBrush = new PathGradientBrush(path);
+            dr.DrawEllipse(Brushes.Red , null, new Point(x, y), 10, 10);
             for (int j = 0; j < numberOfSidesOnExplosion; j++)
             {
                 dr.DrawEllipse(Brushes.Red, null, new Point(x + size*explodeXAngles[j], y + size*explodeYAngles[j]), 3, 3);

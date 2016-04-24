@@ -17,11 +17,21 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <!--<TextBlock Grid.Row="0" Margin="0 0 -1 0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Helvetica" FontSize="18">KINNECT</TextBlock>-->
-
-    <Viewbox Name="MainMode" Grid.Row="1" HorizontalAlignment="Center">
-       
-      <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
-    </Viewbox>
+        <Viewbox Name="BP" Grid.Row="1" HorizontalAlignment="Center">
+            <Image Source="C:\Users\Brian\Documents\GitHub\Kinnnect\Images\1.jpg" Stretch="UniformToFill" />
+        </Viewbox>
+        <Viewbox Name="MainMode" Grid.Row="1" HorizontalAlignment="Center">
+            <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+        </Viewbox>
+        
+        <!--<Viewbox Name="BackgroundPicBox" Grid.Row="1" HorizontalAlignment="Center">
+            <Grid Width="1920" Height="1080">
+                <Image Name="BackgroundPic" Source="Images/1.jpg"/>
+                <Canvas Name="canvas1">
+                    
+                </Canvas>
+            </Grid>
+        </Viewbox>-->
 
         <Viewbox Grid.Row="1">  <!--CAMERA ,KHLAED MODE --> 
             <Grid Width="1920" Height="1080">

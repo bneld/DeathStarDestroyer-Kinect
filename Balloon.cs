@@ -10,12 +10,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 {
     class Balloon
     {
-        private Point location;
+        private System.Windows.Point location;
         private double diameter;
         private Boolean exploded;
         private int explosionRadius;
 
-        public Balloon(Point xlocation, double diameter, Boolean exploded){
+        public Balloon(System.Windows.Point xlocation, double diameter, Boolean exploded){
             this.location = xlocation;
             this.diameter = diameter;
             
@@ -43,7 +43,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             return exploded;
         }
 
-        public void setPoint(Point p)
+        public void setPoint(System.Windows.Point p)
         {
             location = p;
         }
