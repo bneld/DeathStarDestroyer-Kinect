@@ -29,6 +29,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         
         private const int numberOfCirclesAcross = 10;
         private const int numberOfCirclesDown = 10;
+        private const int numberOfSidesOnExplosion = 8;
+        //precompute angles for explosion
+        private double[] explodeXAngles = {1, 0.7071, 0, -0.7071, -1, -0.7071, 0, 0.7071};
+        private double[] explodeYAngles = {0, 0.7071, 1, 0.7071, 0, -0.7071, -1, -0.7071};
         static List<Balloon> backgroundBalloons;
         private int mode = 0; // 0 for start menu , 1 for main game, 2 for khaled's mode, 3 for brian's  
 
@@ -550,7 +554,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 
 
-        //////////////////////METHODS WE WROTE 
+        //////////////////////GAME METHODS
 
 
 
@@ -647,9 +651,26 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             for (int i = 0; i < backgroundBalloons.Count; i++)
             {
-                if (backgroundBalloons[i].getExploded() == false) drawCircle(Brushes.Yellow, dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
+                if (backgroundBalloons[i].getExploded() == false)
+                {
+                    drawCircle(Brushes.Yellow, dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
+                }
+                else
+                {
+                    if (backgroundBalloons[i].getExplosionRadius() < 200)
+                    {
+                        drawExplosion(dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getExplosionRadius());
+                        backgroundBalloons[i].increaseExplosionRadius();
+                    }
+                }
 
-                //     else drawCircle(Brushes.Red , dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
+            }
+        }
+        public void drawExplosion(DrawingContext dr, double x, double y, int size)
+        {
+            for (int j = 0; j < numberOfSidesOnExplosion; j++)
+            {
+                dr.DrawEllipse(Brushes.Red, null, new Point(x + size*explodeXAngles[j], y + size*explodeYAngles[j]), 3, 3);
             }
         }
 
