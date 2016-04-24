@@ -18,7 +18,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     using Microsoft.Kinect;
     using System.Runtime.InteropServices;
     using System.Linq;
-    using System.Windows.Controls;/// <summary>
+    using System.Windows.Controls;
+    using System.Threading.Tasks;
+    
+    /// <summary>
                                   /// Interaction logic for MainWindow
                                   /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
@@ -280,12 +283,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
-                    counter++;
-                    if (counter == 10)
-                    {
-                        dc.DrawRectangle(Brushes.Red, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
-                        counter = 0;
-                    }
+
 
                     //Draw 
                     if (mode == 0) drawStartMenu(dc);
@@ -625,11 +623,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             circleDiameter = this.displayWidth / numberOfCirclesAcross;
 
             //Draw Circles down 
-            double y = circleDiameter / 2;
-            while (y < this.displayHeight)
+            double y = 3 * circleDiameter / 2;
+            while (y < (this.displayHeight - circleDiameter))
             {
-                double x = circleDiameter / 2;
-                while (x < this.displayWidth)
+                double x = 3 * circleDiameter / 2;
+                while (x < (this.displayWidth - circleDiameter))
                 {
                     backgroundBalloons.Add(new Balloon(new Point(x, y), circleDiameter, false));
 
@@ -669,6 +667,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             else if (this.mode == 0)//Main Menu Selection
             {
                 this.mode = checkUserSelection(rightHandPosition.X, rightHandPosition.Y);
+                
             }
             else if (this.mode == 1)
             {
@@ -686,7 +685,81 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
+        ///Patrick's Method
+        private async void countDownTimer(DrawingContext drawingContext)
+        {
 
+
+            String three = "3";
+            String two = "2";
+            String one = "1";
+            String go = "GO!";
+
+            int counter = 3;
+            FormattedText formattedText = new FormattedText(
+                    "Ready...",
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    32,
+                    Brushes.White);
+
+            drawingContext.DrawText(formattedText, new Point((displayWidth / 2) - (formattedText.WidthIncludingTrailingWhitespace / 2), displayHeight / 2 - formattedText.Height));
+
+            await Task.Delay(3000);
+
+            while (counter >= 0)
+            {
+                if (counter == 3)
+                {
+                    formattedText = new FormattedText(
+                    three,
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    32,
+                    Brushes.Red);
+                }
+                else if (counter == 2)
+                {
+                    formattedText = new FormattedText(
+                    two,
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    42,
+                    Brushes.Red);
+                }
+                else if (counter == 1)
+                {
+                    formattedText = new FormattedText(
+                    one,
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    62,
+                    Brushes.Yellow);
+                }
+                else if (counter == 0)
+                {
+                    formattedText = new FormattedText(
+                    go,
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    92,
+                    Brushes.Green);
+                    formattedText.SetFontStyle(FontStyles.Italic);
+                }
+
+                formattedText.SetFontWeight(FontWeights.Bold);
+
+                drawingContext.DrawText(formattedText, new Point((displayWidth / 2) - (formattedText.WidthIncludingTrailingWhitespace / 2), displayHeight / 2 - formattedText.Height));
+                counter--;
+
+                await Task.Delay(1000);
+            }
+        }
 
 
        ///Khaled's Methods 
