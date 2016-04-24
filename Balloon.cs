@@ -13,12 +13,14 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private Point location;
         private double diameter;
         private Boolean exploded;
+        private int explosionRadius;
 
         public Balloon(Point xlocation, double diameter, Boolean exploded){
             this.location = xlocation;
             this.diameter = diameter;
             
             this.exploded = exploded;
+            explosionRadius = 5;
         }
 
         public double getXLocation()
@@ -54,6 +56,14 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         public void setExploded(Boolean e)
         {
             exploded = e;
+        }
+        public int getExplosionRadius()
+        {
+            return explosionRadius;
+        }
+        public void increaseExplosionRadius()
+        {
+            explosionRadius += 5;
         }
     }
 }
