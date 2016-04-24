@@ -78,6 +78,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private ColorFrameReader k_colorReader = null;
         private BodyFrameReader k_bodyReader = null;
         private IList<Body> k_bodies = null;
+        private int kMode = 0;
 
 
 
@@ -173,6 +174,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.k_bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
 
             khaledMode.Source = this.k_bitmap;
+            
             khaledMode.IsEnabled = false;
 
             khaledMode.Visibility = Visibility.Hidden;
@@ -589,6 +591,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     MainMode.Visibility = Visibility.Hidden;
                     MainMode.IsEnabled = false;
+                    khaledLine.Points.Clear();
                     khaledMode.Visibility = Visibility.Visible;
                     khaledMode.IsEnabled = true;
 
@@ -677,11 +680,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
 
-            if (this.rightHandLasso == true && leftHandLasso == true)
+            if (this.rightHandLasso == true && this.leftHandLasso == true)
             {
                 this.mode = 0;
                 khaledMode.Visibility = Visibility.Hidden;
-                canvas.Children.Clear();
+                khaledLine.Points.Clear();   
                 MainMode.Visibility = Visibility.Visible;
                 
             }
@@ -695,12 +698,18 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 detectHit(leftHandPosition, rightHandPosition);
                 drawCircleGrid(dc);
             }
-            else if (mode == 2)// Khaled Mode 
+            else if (this.mode == 2)// Khaled Mode 
             {
-
+                if(kMode == 0)
+                {
+                    if(bothHandsClosed == true)
+                    {
+                        khaledMode
+                    }
+                }
             }
 
-            else if (mode == 3)//Brian's Mode 
+            else if (this.mode == 3)//Brian's Mode 
             {
 
             }
@@ -824,11 +833,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             if (!float.IsInfinity(x) && !float.IsInfinity(y))
                             {
-                                // DRAW!
-
-                                if (this.mode == 2) 
-                                    trail.Points.Add(new Point { X = x, Y = y });
-                                
+                                if (this.mode == 2 && kMode == 1)
+                                    khaledLine.Points.Add(new Point { X = x, Y = y });
                                 //Canvas.SetLeft(brush, x - brush.Width / 2.0);
                                 //Canvas.SetTop(brush, y - brush.Height);
                             }
