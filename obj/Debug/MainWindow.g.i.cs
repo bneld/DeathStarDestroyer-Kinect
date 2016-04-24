@@ -66,7 +66,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics {
         
         #line 31 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        internal System.Windows.Shapes.Polyline trail;
+        internal System.Windows.Shapes.Polyline khaledLine;
         
         #line default
         #line hidden
@@ -133,7 +133,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics {
             this.canvas = ((System.Windows.Controls.Canvas)(target));
             return;
             case 5:
-            this.trail = ((System.Windows.Shapes.Polyline)(target));
+            this.khaledLine = ((System.Windows.Shapes.Polyline)(target));
             return;
             case 6:
             this.statusBar = ((System.Windows.Controls.Primitives.StatusBar)(target));
