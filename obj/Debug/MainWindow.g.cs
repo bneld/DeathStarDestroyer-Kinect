@@ -1,4 +1,3 @@
-
 ﻿#pragma checksum "..\..\MainWindow.xaml" "{406ea660-64cf-4c82-b6f0-42d48172a799}" "DEAE1EB4AB675578D41239658BDF4E0C"
 
 //------------------------------------------------------------------------------
@@ -42,7 +41,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics {
     public partial class MainWindow : System.Windows.Window, System.Windows.Markup.IComponentConnector {
         
         
+<<<<<<< HEAD
 
+=======
+>>>>>>> mybranch
         #line 21 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Viewbox MainMode;
@@ -52,9 +54,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics {
         
         
         #line 28 "..\..\MainWindow.xaml"
+<<<<<<< HEAD
 
         #line 31 "..\..\MainWindow.xaml"
 
+=======
+>>>>>>> mybranch
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Image khaledMode;
         
