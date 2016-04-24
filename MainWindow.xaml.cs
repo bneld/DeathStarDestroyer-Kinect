@@ -19,8 +19,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     using System.Runtime.InteropServices;
     using System.Linq;
     using System.Windows.Controls;
+
     //using System.Drawing;
     using System.Drawing.Drawing2D;
+    using System.Threading.Tasks;
+
     /// <summary>
                                   /// Interaction logic for MainWindow
                                   /// </summary>
@@ -78,8 +81,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private ColorFrameReader k_colorReader = null;
         private BodyFrameReader k_bodyReader = null;
         private IList<Body> k_bodies = null;
+        private int kMode = 0;
 
 
+
+        private int counter = 0;
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -171,6 +177,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.k_bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
 
             khaledMode.Source = this.k_bitmap;
+            
             khaledMode.IsEnabled = false;
 
             khaledMode.Visibility = Visibility.Hidden;
@@ -288,6 +295,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
+
 
                     //Draw 
                     if (mode == 0) drawStartMenu(dc);
@@ -589,6 +597,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     MainMode.Visibility = Visibility.Hidden;
                     MainMode.IsEnabled = false;
+                    khaledLine.Points.Clear();
                     khaledMode.Visibility = Visibility.Visible;
                     khaledMode.IsEnabled = true;
 
@@ -627,11 +636,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             circleDiameter = this.displayWidth / numberOfCirclesAcross;
 
             //Draw Circles down 
-            double y = circleDiameter / 2;
-            while (y < this.displayHeight)
+            double y = 3 * circleDiameter / 2;
+            while (y < (this.displayHeight - circleDiameter))
             {
-                double x = circleDiameter / 2;
-                while (x < this.displayWidth)
+                double x = 3 * circleDiameter / 2;
+                while (x < (this.displayWidth - circleDiameter))
                 {
                     backgroundBalloons.Add(new Balloon(new System.Windows.Point(x, y), circleDiameter, false));
 
@@ -683,35 +692,116 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
 
-            if (this.rightHandLasso == true && leftHandLasso == true)
+            if (this.rightHandLasso == true && this.leftHandLasso == true)
             {
                 this.mode = 0;
                 khaledMode.Visibility = Visibility.Hidden;
-                canvas.Children.Clear();
+                khaledLine.Points.Clear();   
                 MainMode.Visibility = Visibility.Visible;
                 
             }
             else if (this.mode == 0)//Main Menu Selection
             {
                 this.mode = checkUserSelection(rightHandPosition.X, rightHandPosition.Y);
+                
             }
             else if (this.mode == 1)
             {
                 detectHit(leftHandPosition, rightHandPosition);
                 drawCircleGrid(dc);
             }
-            else if (mode == 2)// Khaled Mode 
+            else if (this.mode == 2)// Khaled Mode 
             {
-
+                if(kMode == 0)
+                {
+                    if(bothHandsClosed == true)
+                    {
+                        
+                    }
+                }
             }
 
-            else if (mode == 3)//Brian's Mode 
+            else if (this.mode == 3)//Brian's Mode 
             {
 
             }
         }
 
+        ///Patrick's Method
+        private async void countDownTimer(DrawingContext drawingContext)
+        {
 
+
+            String three = "3";
+            String two = "2";
+            String one = "1";
+            String go = "GO!";
+
+            int counter = 3;
+            FormattedText formattedText = new FormattedText(
+                    "Ready...",
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    32,
+                    Brushes.White);
+
+            drawingContext.DrawText(formattedText, new Point((displayWidth / 2) - (formattedText.WidthIncludingTrailingWhitespace / 2), displayHeight / 2 - formattedText.Height));
+
+            await Task.Delay(3000);
+
+            while (counter >= 0)
+            {
+                if (counter == 3)
+                {
+                    formattedText = new FormattedText(
+                    three,
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    32,
+                    Brushes.Red);
+                }
+                else if (counter == 2)
+                {
+                    formattedText = new FormattedText(
+                    two,
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    42,
+                    Brushes.Red);
+                }
+                else if (counter == 1)
+                {
+                    formattedText = new FormattedText(
+                    one,
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    62,
+                    Brushes.Yellow);
+                }
+                else if (counter == 0)
+                {
+                    formattedText = new FormattedText(
+                    go,
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Verdana"),
+                    92,
+                    Brushes.Green);
+                    formattedText.SetFontStyle(FontStyles.Italic);
+                }
+
+                formattedText.SetFontWeight(FontWeights.Bold);
+
+                drawingContext.DrawText(formattedText, new Point((displayWidth / 2) - (formattedText.WidthIncludingTrailingWhitespace / 2), displayHeight / 2 - formattedText.Height));
+                counter--;
+
+                await Task.Delay(1000);
+            }
+        }
 
 
        ///Khaled's Methods 
@@ -755,11 +845,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             if (!float.IsInfinity(x) && !float.IsInfinity(y))
                             {
-                                // DRAW!
-
-                                if (this.mode == 2) 
-                                    trail.Points.Add(new Point { X = x, Y = y });
-                                
+                                if (this.mode == 2 && kMode == 1)
+                                    khaledLine.Points.Add(new Point { X = x, Y = y });
                                 //Canvas.SetLeft(brush, x - brush.Width / 2.0);
                                 //Canvas.SetTop(brush, y - brush.Height);
                             }
