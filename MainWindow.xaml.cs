@@ -149,6 +149,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// </summary>
         private bool handIsClosed = false;
 
+        private int counter = 0;
+
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
@@ -355,6 +357,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                    
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
+                    counter++;
+                    if (counter == 10)
+                    {
+                        dc.DrawRectangle(Brushes.Red, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
+                        counter = 0;
+                    }
 
                     int penIndex = 0;
                     foreach (Body body in this.bodies)
