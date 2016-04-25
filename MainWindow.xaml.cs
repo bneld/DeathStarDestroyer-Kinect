@@ -35,10 +35,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         
         private const int numberOfCirclesAcross = 10;
         private const int numberOfCirclesDown = 10;
-        private const int numberOfSidesOnExplosion = 8;
+        //private const int numberOfSidesOnExplosion = 8;
+        private const int numberOfSidesOnExplosion = 24;
         //precompute angles for explosion
-        private double[] explodeXAngles = {1, 0.7071, 0, -0.7071, -1, -0.7071, 0, 0.7071};
-        private double[] explodeYAngles = {0, 0.7071, 1, 0.7071, 0, -0.7071, -1, -0.7071};
+        //private double[] explodeXAngles = {1, 0.7071, 0, -0.7071, -1, -0.7071, 0, 0.7071};
+        //private double[] explodeYAngles = {0, 0.7071, 1, 0.7071, 0, -0.7071, -1, -0.7071};
+        private double[] explodeXAngles = { 1, 0.9659, 0.8660, 0.7071, 0.5, 0.2588, 0, -0.2588, -0.5, - 0.7071, -0.8660, -0.9659, -1, -0.9659, -0.8660, -0.7071, -0.5, -0.2588, 0, 0.2588, 0.5, 0.7071, 0.8660, 0.9659};
+        private double[] explodeYAngles = { 0, 0.2588, 0.5, 0.7071, 0.8660, 0.9659, 1, 0.9659, 0.8660, 0.7071, 0.5, 0.2588, 0, -0.2588, -0.5, -0.7071, -0.8660, -0.9659, -1, -0.9659, -0.8660, -0.7071, -0.5, -0.2588 };
         static List<Balloon> backgroundBalloons;
         private int mode = 0; // 0 for start menu , 1 for main game, 2 for khaled's mode, 3 for brian's  
 
@@ -685,28 +688,29 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             double x = balloon.getXLocation();
             double y = balloon.getYLocation();
             int size = balloon.getExplosionRadius();
-            //GraphicsPath path = new GraphicsPath();
-            //path.AddEllipse(0, 0, 140, 70);
 
-            // Use the path to construct a brush.
-            // PathGradientBrush pthGrBrush = new PathGradientBrush(path);
-            
-            //if (size < 100)
-            //{
-                RadialGradientBrush gb = new RadialGradientBrush(Colors.Red, Colors.White);
-                gb.GradientOrigin = new Point(x, y);
-                gb.RadiusX = 30;
-                gb.RadiusY = 30;
-            //gb.Opacity = 1.0 - (size / 200);
-                gb.Opacity = balloon.getExplosionOpacity();
-                gb.Center = new Point(x, y);
-                dr.DrawEllipse(gb, null, new Point(x, y), 30, 30);
-            //}
+            Random rand = new Random();
+            //RadialGradientBrush gb = new RadialGradientBrush(Colors.Red, Colors.White);
+            Color c1 = Color.FromRgb((byte)rand.Next(1, 255), (byte)rand.Next(1, 255), (byte)rand.Next(1, 255));
+            Color c2 = Color.FromRgb((byte)rand.Next(1, 255), (byte)rand.Next(1, 255), (byte)rand.Next(1, 255));
+            RadialGradientBrush gb = new RadialGradientBrush(c1, c2);
+            gb.GradientOrigin = new Point(x, y);
+            gb.RadiusX = 30;
+            gb.RadiusY = 30;
+            gb.Opacity = balloon.getExplosionOpacity();
+            gb.Center = new Point(x, y);
+            dr.DrawEllipse(gb, null, new Point(x, y), 30, 30);
             for (int j = 0; j < numberOfSidesOnExplosion; j++)
             {
-                dr.DrawEllipse(Brushes.Red, null, new Point(x + size*explodeXAngles[j], y + size*explodeYAngles[j]), 3, 3);
+                dr.DrawEllipse(getRandomColorBrush(), null, new Point(x + size*explodeXAngles[j], y + size*explodeYAngles[j]), 3, 3);
             }
         }
+        public SolidColorBrush getRandomColorBrush()
+        {
+            Random r = new Random();
+            r.Next(1, 255);
+            return new SolidColorBrush(Color.FromArgb((byte)245, (byte)r.Next(1, 255), (byte)r.Next(1, 255), (byte)r.Next(1, 255)));
+        } 
 
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
