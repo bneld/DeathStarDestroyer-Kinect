@@ -482,7 +482,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
            drawingContext.DrawEllipse( b, null , new Point(x, y) ,     20,  20);
             BitmapImage xImage = new BitmapImage(new Uri(@"Images\\spaceship.png", UriKind.Relative));
-            xImage.Rotation = 
+           // xImage.Rotation = 
             drawingContext.DrawImage(new BitmapImage(new Uri(@"Images\\spaceship.png", UriKind.Relative)), new Rect(x - 28 , y - 28 , 60 , 60));
              
         }
