@@ -24,9 +24,10 @@
 
         <Viewbox Name="MainMode" Grid.Row="1" HorizontalAlignment="Center">
             <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
-        </Viewbox>
    
+        </Viewbox>
 
+   
         <Viewbox Grid.Row="1">  <!--CAMERA ,KHLAED MODE --> 
             <Grid Width="1920" Height="1080">
                 <Image Name="khaledMode" />

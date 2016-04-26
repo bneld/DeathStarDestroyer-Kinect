@@ -100,8 +100,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         private Boolean countdown = true;
         private Boolean startTimer = true;
+        private Point prevXWingPoint;
 
-        
+
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
@@ -478,15 +479,29 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 
         //Draw Circle 
-        private void drawCircle( Brush b,  DrawingContext drawingContext, double x , double y , double diameter)
+        private void drawCircle( Brush b,  DrawingContext drawingContext, double x , double y , double diameter, int mod)
         {
-           drawingContext.DrawEllipse( b, null , new Point(x, y) ,     20,  20);
-            BitmapImage xImage = new BitmapImage(new Uri(@"Images\\spaceship.png", UriKind.Relative));
-           // xImage.Rotation = 
-            drawingContext.DrawImage(new BitmapImage(new Uri(@"Images\\spaceship.png", UriKind.Relative)), new Rect(x - 28 , y - 28 , 60 , 60));
-             
+            if (mod == 0) // Normal Circle
+            {
+
+                drawingContext.DrawEllipse(b, null, new Point(x, y), 20, 20);
+                drawingContext.DrawImage(new BitmapImage(new Uri(@"Images/spaceship.png", UriKind.RelativeOrAbsolute)), new Rect(x - 28, y - 28, 60, 60));
+            }
+          
+
         }
 
+        private void drawXWing(DrawingContext dc , double x , double y, double angle)
+        {
+            BitmapImage xa = new BitmapImage(new Uri(@"Images/xwing.png", UriKind.RelativeOrAbsolute));
+
+            System.Drawing.Bitmap image1 = (System.Drawing.Bitmap)Image.FromFile(@"C:\Documents and Settings\" +
+                @"All Users\Documents\My Music\music.bmp");
+          
+            dc.DrawEllipse(null, null, new Point(x, y), 20, 20);
+            dc.DrawImage(xa, new Rect(x - 28, y - 28, 60, 60));
+
+        }
         /// <summary>
         /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
         /// </summary>
@@ -500,8 +515,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
-                    drawCircle(Brushes.Blue, drawingContext, handPosition.X, handPosition.Y , 25);
-                   
+                    drawXWing(drawingContext, handPosition.X, handPosition.Y, 44.0);
+
+
                     break;
 
                 case HandState.Open:
@@ -512,8 +528,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
                     break;
             }
+            prevXWingPoint = handPosition;
         }
 
+        public double calclXWingAngle(System.Windows.Point p)
+        {
+            return 0;
+        }
         /// <summary>
         /// Draws indicators to show which edges are clipping body data
         /// </summary>
@@ -707,7 +728,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     if (backgroundBalloons[i].getExploded() == false && backgroundBalloons[i].getVisible() == true)
                     {
-                        drawCircle(Brushes.Yellow, dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
+                        drawCircle(Brushes.Yellow, dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter(), 0);
                     }
                     else if (backgroundBalloons[i].getExploded() == true)
                     {
@@ -748,8 +769,20 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             Random r = new Random();
             r.Next(1, 255);
             return new SolidColorBrush(Color.FromArgb((byte)245, (byte)r.Next(1, 255), (byte)r.Next(1, 255), (byte)r.Next(1, 255)));
-        } 
+        }
+        private System.Drawing.Bitmap RotateImage(System.Drawing.Bitmap bmp, float angle)
+        {
+            System.Drawing.Bitmap rotatedImage = new System.Drawing.Bitmap(bmp.Width, bmp.Height);
+            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(rotatedImage))
+            {
+                g.TranslateTransform(bmp.Width / 2, bmp.Height / 2); //set the rotation point as the center into the matrix
+                g.RotateTransform(angle); //rotate
+                g.TranslateTransform(-bmp.Width / 2, -bmp.Height / 2); //restore rotation point into the matrix
+                g.DrawImage(bmp, new System.Drawing.Point(0, 0)); //draw the image on the new bitmap
+            }
 
+            return rotatedImage;
+        }
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
 
