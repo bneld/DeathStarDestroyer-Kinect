@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Media;
+using System.Diagnostics;
 namespace Microsoft.Samples.Kinect.BodyBasics
 {
     class Balloon
@@ -13,13 +14,15 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private Point location;
         private double diameter;
         private Boolean exploded;
+        private Boolean visible;
         private int explosionRadius;
+        private int ticks;
 
-        public Balloon(Point xlocation, double diameter, Boolean exploded){
+        public Balloon(Point xlocation, double diameter, Boolean exploded, Boolean visible, int ticks){
             this.location = xlocation;
             this.diameter = diameter;
-            
             this.exploded = exploded;
+            this.visible = visible;
             explosionRadius = 5;
         }
 
@@ -43,6 +46,16 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             return exploded;
         }
 
+        public int getTicks()
+        {
+            return ticks;
+        }
+
+        public Boolean getVisible()
+        {
+            return visible;
+        }
+
         public void setPoint(Point p)
         {
             location = p;
@@ -56,7 +69,31 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         public void setExploded(Boolean e)
         {
             exploded = e;
+            if (e)
+            {
+                this.setVisible(false);
+            }
         }
+
+        public void setVisible(Boolean v)
+        {
+            visible = v;
+        }
+
+        public void setTicks(int ticks)
+        {
+            this.ticks = ticks;
+        }
+
+        public void decrementTicks()
+        {
+            this.ticks--;
+            if (ticks < 0)
+            {
+                setVisible(false);
+            }
+        }
+
         public int getExplosionRadius()
         {
             return explosionRadius;

@@ -40,11 +40,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics {
     /// </summary>
     public partial class MainWindow : System.Windows.Window, System.Windows.Markup.IComponentConnector {
         
-        
-<<<<<<< HEAD
 
-=======
->>>>>>> mybranch
         #line 21 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Viewbox MainMode;
@@ -54,12 +50,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics {
         
         
         #line 28 "..\..\MainWindow.xaml"
-<<<<<<< HEAD
+    #line 31 "..\..\MainWindow.xaml"
 
-        #line 31 "..\..\MainWindow.xaml"
-
-=======
->>>>>>> mybranch
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Image khaledMode;
         

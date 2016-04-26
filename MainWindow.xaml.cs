@@ -81,8 +81,16 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 
 
-        private int counter = 0;
+        private int timeCounter = 0;
+        private int maxBalloonsVisible;
+        private int currentBalloonsVisible;
+        private Random rnd = new Random();
+        private int userScore = 0;
 
+        private Boolean countdown = true;
+        private Boolean startTimer = true;
+
+        
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
@@ -563,11 +571,18 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             for(int i = 0; i < backgroundBalloons.Count; i++)
             {
                 double pX = backgroundBalloons[i].getXLocation();
-                double pY = backgroundBalloons[i].getYLocation(); 
-                if(distance(LeftHandPositon.X, LeftHandPositon.Y, pX, pY) <= circleDiameter / 2)
+                double pY = backgroundBalloons[i].getYLocation();
+                if ((distance(LeftHandPositon.X, LeftHandPositon.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
+                {
                     backgroundBalloons[i].setExploded(true);
-                if (distance(rightHandPosition.X, rightHandPosition.Y, pX, pY) <= circleDiameter / 2)
+                    userScore++;
+                }
+                if ((distance(rightHandPosition.X, rightHandPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
+                {
                     backgroundBalloons[i].setExploded(true);
+                    userScore++;
+                }
+                    
 
 
             }
@@ -633,7 +648,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 double x = 3 * circleDiameter / 2;
                 while (x < (this.displayWidth - circleDiameter))
                 {
-                    backgroundBalloons.Add(new Balloon(new Point(x, y), circleDiameter, false));
+                    backgroundBalloons.Add(new Balloon(new Point(x, y), circleDiameter, false, false, 300));
 
                     x += circleDiameter;
                 }
@@ -648,23 +663,43 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
             //Console.Clear();
 
+            maxBalloonsVisible = 5;
+            currentBalloonsVisible = 0;
 
+            int randomBalloonLocation = 0;
+
+            //count current balloons visible
             for (int i = 0; i < backgroundBalloons.Count; i++)
             {
-                if (backgroundBalloons[i].getExploded() == false)
-                {
-                    drawCircle(Brushes.Yellow, dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
-                }
-                else
-                {
-                    if (backgroundBalloons[i].getExplosionRadius() < 200)
-                    {
-                        drawExplosion(dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getExplosionRadius());
-                        backgroundBalloons[i].increaseExplosionRadius();
-                    }
-                }
-
+                if (backgroundBalloons[i].getVisible())
+                    currentBalloonsVisible++;
             }
+            
+            while (currentBalloonsVisible < maxBalloonsVisible)
+            {
+                randomBalloonLocation = rnd.Next(0, backgroundBalloons.Count);
+
+                backgroundBalloons[randomBalloonLocation].setVisible(true);
+
+                currentBalloonsVisible++;
+            }
+
+                for (int i = 0; i < backgroundBalloons.Count; i++)
+                {
+                    if (backgroundBalloons[i].getExploded() == false && backgroundBalloons[i].getVisible() == true)
+                    {
+                        drawCircle(Brushes.Yellow, dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getDiameter());
+                    }
+                    else if (backgroundBalloons[i].getExploded() == true)
+                    {
+                        if (backgroundBalloons[i].getExplosionRadius() < 200)
+                        {
+                            drawExplosion(dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getExplosionRadius());
+                            backgroundBalloons[i].increaseExplosionRadius();
+                        }
+                    }
+
+                }
         }
         public void drawExplosion(DrawingContext dr, double x, double y, int size)
         {
@@ -676,7 +711,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
-
+            
             if (this.rightHandLasso == true && leftHandLasso == true)
             {
                 this.mode = 0;
@@ -688,12 +723,16 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             else if (this.mode == 0)//Main Menu Selection
             {
                 this.mode = checkUserSelection(rightHandPosition.X, rightHandPosition.Y);
-                
+                timeCounter = 0;
+                userScore = 0;
             }
             else if (this.mode == 1)
             {
                 detectHit(leftHandPosition, rightHandPosition);
                 drawCircleGrid(dc);
+                timeCounter++;
+                Console.WriteLine(timeCounter / 30);
+                timeKeeper(dc);
             }
             else if (mode == 2)// Khaled Mode 
             {
@@ -707,80 +746,32 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         }
 
         ///Patrick's Method
-        private async void countDownTimer(DrawingContext drawingContext)
-        {
-
-
-            String three = "3";
-            String two = "2";
-            String one = "1";
-            String go = "GO!";
-
-            int counter = 3;
-            FormattedText formattedText = new FormattedText(
-                    "Ready...",
+        ///
+        private void timeKeeper(DrawingContext drawingContext){
+            String time = Convert.ToString(timeCounter / 30);
+            FormattedText timeText = new FormattedText(
+                    time,
                     CultureInfo.GetCultureInfo("en-us"),
                     FlowDirection.LeftToRight,
                     new Typeface("Verdana"),
                     32,
                     Brushes.White);
 
-            drawingContext.DrawText(formattedText, new Point((displayWidth / 2) - (formattedText.WidthIncludingTrailingWhitespace / 2), displayHeight / 2 - formattedText.Height));
+            drawingContext.DrawText(timeText, new Point((displayWidth / 2) - (timeText.WidthIncludingTrailingWhitespace / 2), timeText.Height));
 
-            await Task.Delay(3000);
+            String score = Convert.ToString(userScore);
 
-            while (counter >= 0)
-            {
-                if (counter == 3)
-                {
-                    formattedText = new FormattedText(
-                    three,
+            FormattedText scoreText = new FormattedText(
+                    score,
                     CultureInfo.GetCultureInfo("en-us"),
                     FlowDirection.LeftToRight,
-                    new Typeface("Verdana"),
-                    32,
-                    Brushes.Red);
-                }
-                else if (counter == 2)
-                {
-                    formattedText = new FormattedText(
-                    two,
-                    CultureInfo.GetCultureInfo("en-us"),
-                    FlowDirection.LeftToRight,
-                    new Typeface("Verdana"),
-                    42,
-                    Brushes.Red);
-                }
-                else if (counter == 1)
-                {
-                    formattedText = new FormattedText(
-                    one,
-                    CultureInfo.GetCultureInfo("en-us"),
-                    FlowDirection.LeftToRight,
-                    new Typeface("Verdana"),
-                    62,
-                    Brushes.Yellow);
-                }
-                else if (counter == 0)
-                {
-                    formattedText = new FormattedText(
-                    go,
-                    CultureInfo.GetCultureInfo("en-us"),
-                    FlowDirection.LeftToRight,
-                    new Typeface("Verdana"),
-                    92,
+                    new Typeface("Helvetica"),
+                    40,
                     Brushes.Green);
-                    formattedText.SetFontStyle(FontStyles.Italic);
-                }
 
-                formattedText.SetFontWeight(FontWeights.Bold);
-
-                drawingContext.DrawText(formattedText, new Point((displayWidth / 2) - (formattedText.WidthIncludingTrailingWhitespace / 2), displayHeight / 2 - formattedText.Height));
-                counter--;
-
-                await Task.Delay(1000);
-            }
+            drawingContext.DrawText(scoreText, new Point((displayWidth / 2) - (scoreText.WidthIncludingTrailingWhitespace / 2), displayHeight - scoreText.Height));
         }
+
 
 
        ///Khaled's Methods 
