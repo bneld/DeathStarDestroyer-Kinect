@@ -9,21 +9,29 @@ using System.Windows.Media;
 using System.Diagnostics;
 namespace Microsoft.Samples.Kinect.BodyBasics
 {
-    class Balloon
+    public class Balloon
     {
-        private Point location;
+        private System.Windows.Point location;
         private double diameter;
         private Boolean exploded;
         private Boolean visible;
         private int explosionRadius;
-        private int ticks;
 
-        public Balloon(Point xlocation, double diameter, Boolean exploded, Boolean visible, int ticks){
+        private int ticks;
+           private double explosionOpacity;
+        public Balloon(System.Windows.Point xlocation, double diameter, Boolean exploded, Boolean visible, int ticks)
+        {
+
             this.location = xlocation;
             this.diameter = diameter;
             this.exploded = exploded;
+
             this.visible = visible;
             explosionRadius = 5;
+
+            this.explosionRadius = 5;
+            this.explosionOpacity = 1.0;
+
         }
 
         public double getXLocation()
@@ -46,6 +54,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             return exploded;
         }
 
+
         public int getTicks()
         {
             return ticks;
@@ -56,7 +65,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             return visible;
         }
 
-        public void setPoint(Point p)
+
+        public void setPoint(System.Windows.Point p)
         {
             location = p;
         }
@@ -101,6 +111,17 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         public void increaseExplosionRadius()
         {
             explosionRadius += 5;
+        }
+        public double getExplosionOpacity()
+        {
+            return explosionOpacity;
+        }
+        public void decreaseExplosionOpacity()
+        {
+            if(explosionOpacity >= 0.25)
+            {
+                explosionOpacity -= 0.25;
+            }
         }
     }
 }

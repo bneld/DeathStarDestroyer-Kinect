@@ -6,6 +6,8 @@
 
 namespace Microsoft.Samples.Kinect.BodyBasics
 {
+    
+   
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -19,20 +21,27 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     using System.Runtime.InteropServices;
     using System.Linq;
     using System.Windows.Controls;
+
+    //using System.Drawing;
+    using System.Drawing.Drawing2D;
     using System.Threading.Tasks;
-    
+
+
     /// <summary>
-                                  /// Interaction logic for MainWindow
-                                  /// </summary>
+    /// Interaction logic for MainWindow
+    /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         
         private const int numberOfCirclesAcross = 10;
         private const int numberOfCirclesDown = 10;
-        private const int numberOfSidesOnExplosion = 8;
+        //private const int numberOfSidesOnExplosion = 8;
+        private const int numberOfSidesOnExplosion = 24;
         //precompute angles for explosion
-        private double[] explodeXAngles = {1, 0.7071, 0, -0.7071, -1, -0.7071, 0, 0.7071};
-        private double[] explodeYAngles = {0, 0.7071, 1, 0.7071, 0, -0.7071, -1, -0.7071};
+        //private double[] explodeXAngles = {1, 0.7071, 0, -0.7071, -1, -0.7071, 0, 0.7071};
+        //private double[] explodeYAngles = {0, 0.7071, 1, 0.7071, 0, -0.7071, -1, -0.7071};
+        private double[] explodeXAngles = { 1, 0.9659, 0.8660, 0.7071, 0.5, 0.2588, 0, -0.2588, -0.5, - 0.7071, -0.8660, -0.9659, -1, -0.9659, -0.8660, -0.7071, -0.5, -0.2588, 0, 0.2588, 0.5, 0.7071, 0.8660, 0.9659};
+        private double[] explodeYAngles = { 0, 0.2588, 0.5, 0.7071, 0.8660, 0.9659, 1, 0.9659, 0.8660, 0.7071, 0.5, 0.2588, 0, -0.2588, -0.5, -0.7071, -0.8660, -0.9659, -1, -0.9659, -0.8660, -0.7071, -0.5, -0.2588 };
         static List<Balloon> backgroundBalloons;
         private int mode = 0; // 0 for start menu , 1 for main game, 2 for khaled's mode, 3 for brian's  
 
@@ -78,6 +87,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private ColorFrameReader k_colorReader = null;
         private BodyFrameReader k_bodyReader = null;
         private IList<Body> k_bodies = null;
+        private int kMode = 0;
+        private bool photoTaken = false; 
 
 
 
@@ -181,9 +192,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.k_bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
 
             khaledMode.Source = this.k_bitmap;
+            
             khaledMode.IsEnabled = false;
 
             khaledMode.Visibility = Visibility.Hidden;
+
+            //BackgroundPic.IsEnabled = false;
+            //BackgroundPic.Visibility = Visibility.Hidden;
            
         }
 
@@ -465,7 +480,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         //Draw Circle 
         private void drawCircle( Brush b,  DrawingContext drawingContext, double x , double y , double diameter)
         {
-            drawingContext.DrawEllipse( b, null , new Point(x, y) ,     25,  25);
+           drawingContext.DrawEllipse( b, null , new Point(x, y) ,     20,  20);
+            drawingContext.DrawImage(new BitmapImage(new Uri("\\Images\\spaceship.png")), new Rect(x - 28 , y - 28 , 60 , 60));
              
         }
 
@@ -604,6 +620,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     MainMode.Visibility = Visibility.Hidden;
                     MainMode.IsEnabled = false;
+                    khaledLine.Points.Clear();
                     khaledMode.Visibility = Visibility.Visible;
                     khaledMode.IsEnabled = true;
 
@@ -648,7 +665,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 double x = 3 * circleDiameter / 2;
                 while (x < (this.displayWidth - circleDiameter))
                 {
-                    backgroundBalloons.Add(new Balloon(new Point(x, y), circleDiameter, false, false, 300));
+                    backgroundBalloons.Add(new Balloon(new System.Windows.Point(x, y), circleDiameter, false, false, 300));
 
                     x += circleDiameter;
                 }
@@ -694,30 +711,53 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     {
                         if (backgroundBalloons[i].getExplosionRadius() < 200)
                         {
-                            drawExplosion(dr, backgroundBalloons[i].getXLocation(), backgroundBalloons[i].getYLocation(), backgroundBalloons[i].getExplosionRadius());
+                            drawExplosion(dr, backgroundBalloons[i]);
                             backgroundBalloons[i].increaseExplosionRadius();
+                            backgroundBalloons[i].decreaseExplosionOpacity();
                         }
                     }
 
                 }
         }
-        public void drawExplosion(DrawingContext dr, double x, double y, int size)
+        public void drawExplosion(DrawingContext dr, Balloon balloon)
         {
+            double x = balloon.getXLocation();
+            double y = balloon.getYLocation();
+            int size = balloon.getExplosionRadius();
+
+            Random rand = new Random();
+            //RadialGradientBrush gb = new RadialGradientBrush(Colors.Red, Colors.White);
+            Color c1 = Color.FromRgb((byte)rand.Next(1, 255), (byte)rand.Next(1, 255), (byte)rand.Next(1, 255));
+            Color c2 = Color.FromRgb((byte)rand.Next(1, 255), (byte)rand.Next(1, 255), (byte)rand.Next(1, 255));
+            RadialGradientBrush gb = new RadialGradientBrush(c1, c2);
+            gb.GradientOrigin = new Point(x, y);
+            gb.RadiusX = 30;
+            gb.RadiusY = 30;
+            gb.Opacity = balloon.getExplosionOpacity();
+            gb.Center = new Point(x, y);
+            dr.DrawEllipse(gb, null, new Point(x, y), 30, 30);
             for (int j = 0; j < numberOfSidesOnExplosion; j++)
             {
-                dr.DrawEllipse(Brushes.Red, null, new Point(x + size*explodeXAngles[j], y + size*explodeYAngles[j]), 3, 3);
+                dr.DrawEllipse(getRandomColorBrush(), null, new Point(x + size*explodeXAngles[j], y + size*explodeYAngles[j]), 3, 3);
             }
         }
+        public SolidColorBrush getRandomColorBrush()
+        {
+            Random r = new Random();
+            r.Next(1, 255);
+            return new SolidColorBrush(Color.FromArgb((byte)245, (byte)r.Next(1, 255), (byte)r.Next(1, 255), (byte)r.Next(1, 255)));
+        } 
 
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
-            
-            if (this.rightHandLasso == true && leftHandLasso == true)
+
+            if (this.rightHandLasso == true && this.leftHandLasso == true)
+
             {
                 this.mode = 0;
-                khaledMode.Visibility = Visibility.Hidden;
-                canvas.Children.Clear();
-                MainMode.Visibility = Visibility.Visible;
+                this.khaledMode.Visibility = Visibility.Hidden;
+                this.khaledLine.Points.Clear();   
+                this.MainMode.Visibility = Visibility.Visible;
                 
             }
             else if (this.mode == 0)//Main Menu Selection
@@ -734,18 +774,25 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 Console.WriteLine(timeCounter / 30);
                 timeKeeper(dc);
             }
-            else if (mode == 2)// Khaled Mode 
+            else if (this.mode == 2)// Khaled Mode 
             {
-
+                if(kMode == 0)
+                {
+                    if (this.leftHandClosed = true && this.rightHandLasso == true && this.photoTaken == false)
+                    {
+                        takeScreenshot();
+                    }
+                }
             }
 
-            else if (mode == 3)//Brian's Mode 
+            else if (this.mode == 3)//Brian's Mode 
             {
 
             }
         }
 
         ///Patrick's Method
+
         ///
         private void timeKeeper(DrawingContext drawingContext){
             String time = Convert.ToString(timeCounter / 30);
@@ -815,11 +862,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             if (!float.IsInfinity(x) && !float.IsInfinity(y))
                             {
-                                // DRAW!
-
-                                if (this.mode == 2) 
-                                    trail.Points.Add(new Point { X = x, Y = y });
-                                
+                                if (this.mode == 2 && kMode == 1)
+                                    khaledLine.Points.Add(new Point { X = x, Y = y });
                                 //Canvas.SetLeft(brush, x - brush.Width / 2.0);
                                 //Canvas.SetTop(brush, y - brush.Height);
                             }
@@ -828,6 +872,43 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 }
             }
         }
+
+
+        private void takeScreenshot()
+        {
+            if (this.k_bitmap != null)
+            {
+                // create a png bitmap encoder which knows how to save a .png file
+                BitmapEncoder encoder = new PngBitmapEncoder();
+
+                // create frame from the writable bitmap and add to encoder
+                encoder.Frames.Add(BitmapFrame.Create(this.k_bitmap));
+
+                string time = System.DateTime.UtcNow.ToString("hh'-'mm'-'ss", CultureInfo.CurrentUICulture.DateTimeFormat);
+
+                string myPhotos = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+
+                string path = Path.Combine(myPhotos, "userPhoto.png");
+
+                // write the new file to disk
+                try
+                {
+                    // FileStream is IDisposable
+                    using (FileStream fs = new FileStream(path, FileMode.Create))
+                    {
+                        encoder.Save(fs);
+                        this.photoTaken = true;
+                    }
+
+                }
+                catch (IOException)
+                {
+                  //  this.StatusText = string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedScreenshotStatusTextFormat, path);
+                }
+            }
+        }
+
+
 
 
     }
