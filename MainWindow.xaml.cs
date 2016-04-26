@@ -481,7 +481,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private void drawCircle( Brush b,  DrawingContext drawingContext, double x , double y , double diameter)
         {
            drawingContext.DrawEllipse( b, null , new Point(x, y) ,     20,  20);
-            drawingContext.DrawImage(new BitmapImage(new Uri("\\Images\\spaceship.png")), new Rect(x - 28 , y - 28 , 60 , 60));
+            BitmapImage xImage = new BitmapImage(new Uri(@"Images\\spaceship.png", UriKind.Relative));
+            xImage.Rotation = 
+            drawingContext.DrawImage(new BitmapImage(new Uri(@"Images\\spaceship.png", UriKind.Relative)), new Rect(x - 28 , y - 28 , 60 , 60));
              
         }
 
