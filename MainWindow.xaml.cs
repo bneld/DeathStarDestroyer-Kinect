@@ -69,6 +69,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private int displayHeight;
         private List<Pen> bodyColors;
         private string statusText = null;
+        private Point prevXWingPoint;
         
         private List<Balloon> balloons;
         private bool bothHandsClosed = false;
@@ -496,12 +497,20 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// 
         private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
         {
-           switch (handState)
+            switch (handState)
             {
                 case HandState.Closed:
-                    drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
-                    drawCircle(Brushes.Blue, drawingContext, handPosition.X, handPosition.Y , 25);
-                   
+                    if (this.mode == 0) //start menu
+                    {
+                        drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
+                        drawCircle(Brushes.Blue, drawingContext, handPosition.X, handPosition.Y, 25, 1);
+                    }
+                    else if (this.mode == 1) //primary game mode
+                    {
+                        
+                        drawXWing(drawingContext, handPosition.X, handPosition.Y , calcXWingAngle(handPosition));
+                    }
+
                     break;
 
                 case HandState.Open:
@@ -512,6 +521,16 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
                     break;
             }
+            prevXWingPoint = handPosition;
+        }
+
+        public double calcXWingAngle(Point p)
+        {
+            if (prevXWingPoint != null)
+            {
+                return (p.Y - prevXWingPoint.Y) / (p.X - prevXWingPoint.X);
+            }
+            else return 0.0;
         }
 
         /// <summary>
