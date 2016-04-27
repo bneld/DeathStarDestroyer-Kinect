@@ -104,6 +104,20 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private Point prevXWingPoint;
         private BitmapImage userPhotoBitmap;
 
+        //Transformation related 
+        private TransformGroup rtrGrp;
+        private SkewTransform rtrSkw;
+        private RotateTransform rtrRot;
+        private TranslateTransform rtrTns;
+        private ScaleTransform rtrScl;
+
+
+        private TransformGroup ltrGrp;
+        private SkewTransform ltrSkw;
+        private RotateTransform ltrRot;
+        private TranslateTransform ltrTns;
+        private ScaleTransform ltrScl;
+
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -179,6 +193,35 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             createCircleGrid();
 
 
+            //Transformations related 
+            //Right wing 
+            rtrSkw = new SkewTransform(0, 0);
+            rtrRot = new RotateTransform(0);
+            rtrTns = new TranslateTransform(0, 0);
+            rtrScl = new ScaleTransform(1, 1);
+
+            rtrGrp = new TransformGroup();
+            rtrGrp.Children.Add(rtrSkw);
+            rtrGrp.Children.Add(rtrRot);
+            rtrGrp.Children.Add(rtrTns);
+            rtrGrp.Children.Add(rtrScl);
+            //left wing
+            ltrSkw = new SkewTransform(0, 0);
+            ltrRot = new RotateTransform(0);
+            ltrTns = new TranslateTransform(0, 0);
+            ltrScl = new ScaleTransform(1, 1);
+
+            ltrGrp = new TransformGroup();
+            ltrGrp.Children.Add(ltrSkw);
+            ltrGrp.Children.Add(ltrRot);
+            ltrGrp.Children.Add(ltrTns);
+            ltrGrp.Children.Add(ltrScl);
+
+
+            //wing.Visibility = Visibility.Visible;
+
+
+
             //Khaled's Initializations. 
             this.k_width = this.kinectSensor.ColorFrameSource.FrameDescription.Width;
             this.k_height = this.kinectSensor.ColorFrameSource.FrameDescription.Height;
@@ -250,6 +293,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// <param name="e">event arguments</param>
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            
+            leftWing.RenderTransform = ltrGrp;
+            RightWing.RenderTransform = rtrGrp;
+           
+            //lSclX.Value = slSclY.Value = 1;
             if (this.bodyFrameReader != null)
             {
                 this.bodyFrameReader.FrameArrived += this.Reader_FrameArrived;
@@ -360,6 +408,16 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                         
                             this.DrawBody(joints, jointPoints, dc, drawPen);
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
+                            //ltrTns.X = jointPoints[JointType.HandLeft].X;
+                            //ltrTns.Y = jointPoints[JointType.HandLeft].Y;
+                            // Draw the xWing along the hand 
+                            //leftWing.Margin = new Thickness(this.Width - jointPoints[JointType.HandLeft].X, jointPoints[JointType.HandLeft].Y,
+                            //             jointPoints[JointType.HandLeft].X, this.Height - jointPoints[JointType.HandLeft].Y);
+                            //RightWing.Margin = new Thickness(this.Width - jointPoints[JointType.HandRight].X, jointPoints[JointType.HandRight].Y,
+                            //       jointPoints[JointType.HandRight].X, this.Height - jointPoints[JointType.HandRight].Y);
+
+                            
+
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
                             this.startGame(dc, jointPoints[JointType.HandLeft], jointPoints[JointType.HandRight]);
                             //this.drawCircles(body.HandRightState, jointPoints[JointType.HandRight], dc);
@@ -496,8 +554,20 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             var logoimage = Path.Combine(outPutDirectory, "Images\\xwing.png");
 
-            var overlayIamge = new BitmapImage(new Uri(logoimage, UriKind.RelativeOrAbsolute));
+
+            BitmapImage overlayIamge = new BitmapImage(new Uri(logoimage, UriKind.RelativeOrAbsolute));
+            leftWing = new System.Windows.Shapes.Rectangle();
             dc.DrawImage(overlayIamge, new Rect(x, y, 30, 30));
+            
+
+
+           
+            
+
+            //var transform = this.MyImage.RenderTransform as CompositeTransform;
+            //var currentScaleX = transform.ScaleX;
+            //var angle = transform.Rotation;
+            //var offsetX = transform.TranslateX;
 
         }
 
@@ -514,6 +584,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
+                    
                      if(this.mode == 1)  drawXWing(drawingContext, handPosition.X, handPosition.Y, 44.0);
 
 
@@ -780,6 +851,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             return rotatedImage;
         }
+
+
+        
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
 
