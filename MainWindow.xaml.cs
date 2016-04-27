@@ -69,8 +69,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private int displayHeight;
         private List<Pen> bodyColors;
         private string statusText = null;
-        private Point prevXWingPoint;
-        
+        private Point prevXWingPointLeft;
+        private Point prevXWingPointRight;
+
         private List<Balloon> balloons;
         private bool bothHandsClosed = false;
         private bool rightHandClosed = false;
@@ -355,8 +356,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                             
                         
                             this.DrawBody(joints, jointPoints, dc, drawPen);
-                            this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
-                            this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
+                            this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc, true);
+                            this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc, false);
                             this.startGame(dc, jointPoints[JointType.HandLeft], jointPoints[JointType.HandRight]);
                             //this.drawCircles(body.HandRightState, jointPoints[JointType.HandRight], dc);
 
@@ -491,7 +492,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
 
                 drawingContext.DrawEllipse(b, null, new Point(x, y), 20, 20);
-                //drawingContext.DrawImage(new BitmapImage(new Uri(@"Images/spaceship.png", UriKind.RelativeOrAbsolute)), new Rect(x - 28, y - 28, 60, 60));
+                drawingContext.DrawImage(new BitmapImage(new Uri(@"Images/spaceship.png", UriKind.RelativeOrAbsolute)), new Rect(x - 28, y - 28, 60, 60));
             }
           
 
@@ -545,7 +546,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// <param name="handPosition">position of the hand</param>
         /// <param name="drawingContext">drawing context to draw to</param>
         /// 
-        private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
+        private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext, Boolean isLeft)
         {
             switch (handState)
             {
@@ -558,7 +559,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     else if (this.mode == 1) //primary game mode
                     {
                         //drawXWing(drawingContext, handPosition.X, handPosition.Y , calcXWingAngle(handPosition));
-                        Console.WriteLine("Brian's angle is " + calcXWingAngle(handPosition));
+
+                        if (isLeft) Console.WriteLine("Brian's left angle is " + calcXWingAngle(handPosition,prevXWingPointLeft));
+                        else Console.WriteLine("Brian's right angle is " + calcXWingAngle(handPosition, prevXWingPointRight));
                     }
                     break;
 
@@ -570,49 +573,48 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
                     break;
             }
-            prevXWingPoint = handPosition;
+
+            if (isLeft) prevXWingPointLeft = handPosition;
+            else prevXWingPointRight = handPosition;
         }
 
-        public double calcXWingAngle(Point p)
+        public double calcXWingAngle(Point current, Point prev)
         {
-            if (prevXWingPoint != null)
+            if (current == null || prev == null) return 0;
+
+            double slope = (current.Y - prev.Y) / (current.X - prev.X);
+            double x1 = prev.X;
+            double y1 = prev.Y;
+            double x2 = current.X;
+            double y2 = current.Y;
+
+            if (x2 < x1 && y2 < y1)
             {
-                double slope =  (p.Y - prevXWingPoint.Y) / (p.X - prevXWingPoint.X);
-                double x1 = prevXWingPoint.X;
-                double y1 = prevXWingPoint.Y;
-                double x2 = p.X;
-                double y2 = p.Y;
-
-                if (x2 < x1 && y2 < y1)
-                {
-                    return 180 + RadianToDegree(Math.Tan(slope));
-                }
-                else if (x2 < x1 && y2 > y1)
-                {
-                    return 180 - RadianToDegree(Math.Tan(slope));
-                }
-                else if (x2 > x1 && y2 > y1)
-                {
-                    return RadianToDegree(Math.Tan(slope));
-                }
-                else if (x2 > x1 && y2 < y1)
-                {
-                    return -RadianToDegree(Math.Tan(slope));
-                }
-                else if (y1 == y2)
-                {
-                    if (x1 < x2) return 0;
-                    else return 180;
-                }
-                else if (x1 == x2)
-                {
-                    if (y1 < y2) return 90;
-                    else return 270;
-                }
-                else return 0;
-
+                return 180 + RadianToDegree(Math.Atan(slope));
             }
-            else return 0.0;
+            else if (x2 < x1 && y2 > y1)
+            {
+                return 180 - RadianToDegree(Math.Atan(slope));
+            }
+            else if (x2 > x1 && y2 > y1)
+            {
+                return RadianToDegree(Math.Atan(slope));
+            }
+            else if (x2 > x1 && y2 < y1)
+            {
+                return -RadianToDegree(Math.Atan(slope));
+            }
+            else if (y1 == y2)
+            {
+                if (x1 < x2) return 0;
+                else return 180;
+            }
+            else if (x1 == x2)
+            {
+                if (y1 < y2) return 90;
+                else return 270;
+            }
+            else return 0;
         }
         private double RadianToDegree(double angle)
         {
