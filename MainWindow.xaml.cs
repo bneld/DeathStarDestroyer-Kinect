@@ -500,7 +500,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private void drawXWing(DrawingContext dc , double x , double y, double angle)
         {
             //BitmapImage xa = new BitmapImage(new Uri(@"Images/xwing.png", UriKind.RelativeOrAbsolute));
-
             //System.Drawing.Bitmap image1 = (System.Drawing.Bitmap)Image.FromFile(@"C:\Documents and Settings\" +
             //  @"All Users\Documents\My Music\music.bmp");
             //String dir = Path.GetDirectoryName(Application.ExecutablePath);
@@ -520,7 +519,25 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             //dc2.DrawImage(b, 0, 0);
 
+            System.Drawing.Bitmap image1 = new System.Drawing.Bitmap("D:\\image.png");
+            RotateImage(image1, 60);
+            dc.DrawEllipse(null, null, new Point(x, y), 20, 20);
+          
+
+            dc.DrawImage(Bitmap2BitmapImage(image1), new Rect(x - 28, y - 28, 60, 60));
+
         }
+
+        private BitmapImage Bitmap2BitmapImage(System.Drawing.Bitmap bitmap)
+        {
+            BitmapSource i = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                           bitmap.GetHbitmap(),
+                           IntPtr.Zero,
+                           Int32Rect.Empty,
+                           BitmapSizeOptions.FromEmptyOptions());
+            return (BitmapImage)i;
+        }
+
         /// <summary>
         /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
         /// </summary>
