@@ -6,8 +6,8 @@
 
 namespace Microsoft.Samples.Kinect.BodyBasics
 {
-    
-   
+
+
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -25,7 +25,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     //using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Threading.Tasks;
-
+    using System.Reflection;
 
     /// <summary>
     /// Interaction logic for MainWindow
@@ -88,7 +88,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private BodyFrameReader k_bodyReader = null;
         private IList<Body> k_bodies = null;
         private int kMode = 0;
-        private bool photoTaken = false; 
+        private bool photoTaken = false;
+        private String userPhotoPath; 
 
 
 
@@ -101,6 +102,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private Boolean countdown = true;
         private Boolean startTimer = true;
         private Point prevXWingPoint;
+        private BitmapImage userPhotoBitmap;
 
 
         /// <summary>
@@ -193,9 +195,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.k_bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
 
             khaledMode.Source = this.k_bitmap;
-            
-            khaledMode.IsEnabled = false;
-
             khaledMode.Visibility = Visibility.Hidden;
 
             //BackgroundPic.IsEnabled = false;
@@ -274,6 +273,17 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 this.kinectSensor.Close();
                 this.kinectSensor = null;
             }
+
+            if (this.k_colorReader != null)
+            {
+                this.k_colorReader.Dispose();
+            }
+
+            if (this.k_bodyReader != null)
+            {
+                this.k_bodyReader.Dispose();
+            }
+
         }
 
         
@@ -396,13 +406,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
+     
         /// Draws a body
-        /// </summary>
-        /// <param name="joints">joints to draw</param>
-        /// <param name="jointPoints">translated positions of joints to draw</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
-        /// <param name="drawingPen">specifies color to draw a specific body</param>
+       /// <param name="joints">joints to draw</param>
+       
         private void DrawBody(IReadOnlyDictionary<JointType, Joint> joints, IDictionary<JointType, Point> jointPoints, DrawingContext drawingContext, Pen drawingPen)
         {
             // Draw the bones
@@ -414,15 +421,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             // Draw the joints
             foreach (JointType jointType in joints.Keys)
             {
-                // Right Leg
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.HipRight, JointType.KneeRight));
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.KneeRight, JointType.AnkleRight));
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.AnkleRight, JointType.FootRight));
-
-                // Left Leg
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.HipLeft, JointType.KneeLeft));
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.KneeLeft, JointType.AnkleLeft));
-                //this.bones.Add(new Tuple<JointType, JointType>(JointType.AnkleLeft, JointType.FootLeft));
+             
                 if (!jointType.Equals(JointType.KneeLeft) && !jointType.Equals(JointType.KneeRight) && !jointType.Equals(JointType.AnkleLeft) && !jointType.Equals(JointType.AnkleRight) && !jointType.Equals(JointType.FootRight) && !jointType.Equals(JointType.FootLeft) && !jointType.Equals(JointType.Head) && !jointType.Equals(JointType.Neck) && !jointType.Equals(JointType.SpineShoulder) && !jointType.Equals(JointType.SpineMid) && !jointType.Equals(JointType.SpineBase) && !jointType.Equals(JointType.HipRight) && !jointType.Equals(JointType.HipLeft))
                 {
                     Brush drawBrush = null;
@@ -448,13 +447,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         /// <summary>
         /// Draws one bone of a body (joint to joint)
-        /// </summary>
-        /// <param name="joints">joints to draw</param>
-        /// <param name="jointPoints">translated positions of joints to draw</param>
-        /// <param name="jointType0">first joint of bone to draw</param>
-        /// <param name="jointType1">second joint of bone to draw</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
-        /// /// <param name="drawingPen">specifies color to draw a specific bone</param>
+       
         private void DrawBone(IReadOnlyDictionary<JointType, Joint> joints, IDictionary<JointType, Point> jointPoints, JointType jointType0, JointType jointType1, DrawingContext drawingContext, Pen drawingPen)
         {
             Joint joint0 = joints[jointType0];
@@ -493,33 +486,27 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         private void drawXWing(DrawingContext dc , double x , double y, double angle)
         {
-            BitmapImage xa = new BitmapImage(new Uri(@"Images/xwing.png", UriKind.RelativeOrAbsolute));
+            //BitmapImage xa = new BitmapImage(new Uri(@"Images/xwing.png", UriKind.RelativeOrAbsolute));
 
-            System.Drawing.Bitmap image1 = new System.Drawing.Bitmap("D:\\image.png");
-            RotateImage(image1, 60);
-            dc.DrawEllipse(null, null, new Point(x, y), 20, 20);
-          
+            //System.Drawing.Bitmap image1 = new System.Drawing.Bitmap("D:\\image.png");
+            //RotateImage(image1, 60);
+            //dc.DrawEllipse(null, null, new Point(x, y), 20, 20);
+            // dc.DrawImage(Bitmap2BitmapImage(image1), new Rect(x - 28, y - 28, 60, 60));
+            var outPutDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
 
-            dc.DrawImage(Bitmap2BitmapImage(image1), new Rect(x - 28, y - 28, 60, 60));
+            var logoimage = Path.Combine(outPutDirectory, "Images\\xwing.png");
+
+            var overlayIamge = new BitmapImage(new Uri(logoimage, UriKind.RelativeOrAbsolute));
+            dc.DrawImage(overlayIamge, new Rect(x, y, 30, 30));
 
         }
 
-        private BitmapImage Bitmap2BitmapImage(System.Drawing.Bitmap bitmap)
-        {
-            BitmapSource i = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                           bitmap.GetHbitmap(),
-                           IntPtr.Zero,
-                           Int32Rect.Empty,
-                           BitmapSizeOptions.FromEmptyOptions());
-            return (BitmapImage)i;
-        }
+      
 
         /// <summary>
         /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
         /// </summary>
-        /// <param name="handState">state of the hand</param>
-        /// <param name="handPosition">position of the hand</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
+       
         /// 
         private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
         {
@@ -527,7 +514,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
-                    drawXWing(drawingContext, handPosition.X, handPosition.Y, 44.0);
+                     if(this.mode == 1)  drawXWing(drawingContext, handPosition.X, handPosition.Y, 44.0);
 
 
                     break;
@@ -550,8 +537,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// <summary>
         /// Draws indicators to show which edges are clipping body data
         /// </summary>
-        /// <param name="body">body to draw clipping information for</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
+       
         private void DrawClippedEdges(Body body, DrawingContext drawingContext)
         {
             FrameEdges clippedEdges = body.ClippedEdges;
@@ -592,8 +578,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// <summary>
         /// Handles the event which the sensor becomes unavailable (E.g. paused, closed, unplugged).
         /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
+      
         private void Sensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
         {
             // on failure, set the status text
@@ -655,10 +640,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     MainMode.Visibility = Visibility.Hidden;
                     MainMode.IsEnabled = false;
-                    khaledLine.Points.Clear();
+                    khaledLineImage.Points.Clear();
+                    
                     khaledMode.Visibility = Visibility.Visible;
                     khaledMode.IsEnabled = true;
-
                     Console.WriteLine("KHALED MODE");
                     return 2;
                 }
@@ -803,7 +788,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 this.mode = 0;
                 this.khaledMode.Visibility = Visibility.Hidden;
-                this.khaledLine.Points.Clear();   
+                this.khaledModeImage.Visibility = Visibility.Hidden;
+                this.khaledLineImage.Points.Clear();   
                 this.MainMode.Visibility = Visibility.Visible;
                 
             }
@@ -813,7 +799,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 timeCounter = 0;
                 userScore = 0;
             }
-            else if (this.mode == 1)
+            else if (this.mode == 1) // Game Mode 
             {
                 detectHit(leftHandPosition, rightHandPosition);
                 drawCircleGrid(dc);
@@ -823,12 +809,30 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
             else if (this.mode == 2)// Khaled Mode 
             {
-                if(kMode == 0)
+                if(this.kMode == 0)
                 {
-                    if (this.leftHandClosed = true && this.rightHandLasso == true && this.photoTaken == false)
+                    if (this.leftHandClosed = true && this.rightHandLasso == true )
                     {
-                        takeScreenshot();
+                        takeScreenshot(dc );
+                       
+                        
                     }
+                }
+                else if (this.kMode == 1)
+                {
+
+                    //  dc.DrawImage(this.userPhotoBitmap, new Rect(0, 0 , this.Width,this.Height));
+
+                    Uri imageUri = new Uri(userPhotoPath, UriKind.Relative);
+                    BitmapImage source  = new BitmapImage(new Uri(userPhotoPath, UriKind.RelativeOrAbsolute));
+                 
+                    khaledMode.Visibility = Visibility.Hidden;
+                    canvasUserImage.Source = source;
+                    khaledModeImage.Visibility = Visibility.Visible;
+
+                    //Drawing Menus 
+                    
+                    dc.DrawRectangle(Brushes.Blue, new Pen(), new Rect(0, 0, 100, 200));
                 }
             }
 
@@ -909,10 +913,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             if (!float.IsInfinity(x) && !float.IsInfinity(y))
                             {
-                                if (this.mode == 2 && kMode == 1)
-                                    khaledLine.Points.Add(new Point { X = x, Y = y });
-                                //Canvas.SetLeft(brush, x - brush.Width / 2.0);
-                                //Canvas.SetTop(brush, y - brush.Height);
+                                if (this.mode ==2 && this.kMode == 1 )
+                                {
+                                  //  canvas.Visibility = Visibility.Visible;
+                                    khaledLineImage.Points.Add(new System.Windows.Point { X = x, Y = y });
+                                  
+                                }
+                                
                             }
                         }
                     }
@@ -921,7 +928,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         }
 
 
-        private void takeScreenshot()
+        private void takeScreenshot(DrawingContext dc )
         {
             if (this.k_bitmap != null)
             {
@@ -930,11 +937,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 // create frame from the writable bitmap and add to encoder
                 encoder.Frames.Add(BitmapFrame.Create(this.k_bitmap));
-
-                string time = System.DateTime.UtcNow.ToString("hh'-'mm'-'ss", CultureInfo.CurrentUICulture.DateTimeFormat);
-
                 string myPhotos = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-
                 string path = Path.Combine(myPhotos, "userPhoto.png");
 
                 // write the new file to disk
@@ -944,7 +947,28 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     using (FileStream fs = new FileStream(path, FileMode.Create))
                     {
                         encoder.Save(fs);
-                        this.photoTaken = true;
+                        //Set the background photo to be the photo that was just saved 
+
+
+                        //Image finalImage = new Image();
+                        //  finalImage.Width = this.Width; 
+                        //BitmapImage logo = new BitmapImage();
+                        //logo.BeginInit();
+                        //logo.UriSource = new Uri(path , UriKind.RelativeOrAbsolute);
+                        //logo.EndInit();
+                        //this.kMode = 1; 
+                        //this.khaledMode.Source = null;
+                        userPhotoPath = path;
+                        this.kMode = 1;
+                        
+                        
+
+                     //   BitmapImage imageBitmap = new BitmapImage(imageUri);
+                       
+
+
+
+
                     }
 
                 }
