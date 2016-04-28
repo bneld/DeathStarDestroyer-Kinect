@@ -106,6 +106,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private Boolean countdown = true;
         private Boolean startTimer = true;
 
+
+        private MyMenuButton playButton;
+        private MyMenuButton khaledButton;
+        private MyMenuButton brianButton;
+
         private Point prevXWingPoint;
         private BitmapImage userPhotoBitmap;
 
@@ -124,12 +129,14 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private ScaleTransform ltrScl;
 
 
+
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
         public MainWindow()
         {
-           
+
+            Console.WriteLine(Directory.GetCurrentDirectory());
 
             // one sensor is currently supported
             this.kinectSensor = KinectSensor.GetDefault();
@@ -253,8 +260,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             //BackgroundPic.IsEnabled = false;
             //BackgroundPic.Visibility = Visibility.Hidden;
-          
 
+
+            playButton = new MyMenuButton("Survival", Brushes.Yellow, Brushes.Gray, new Pen(Brushes.DarkGray, 5), (int) (this.displayWidth * 0.2), (int) (this.displayHeight * .2), (int) (this.displayWidth * .6), (int) (this.displayHeight * .2));
+            khaledButton = new MyMenuButton("Khaled's Mode", Brushes.Red, Brushes.White, new Pen(Brushes.Blue, 5), (int) (this.displayWidth * 0.2), (int) (this.displayHeight * .4 + 10), (int) (this.displayWidth * .6), (int) (this.displayHeight * .2));
+            brianButton = new MyMenuButton("Brian's Mode", Brushes.Black, Brushes.DarkGray, new Pen(Brushes.Red, 5), (int) (this.displayWidth * 0.2), (int) (this.displayHeight * .6 + 20), (int) (this.displayWidth * .6), (int) (this.displayHeight * .2));
         }
 
         
@@ -385,11 +395,20 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
+                    
+                    //Random randomNum = new Random();
+                    //for (int i = 0; i < 100; i++)
+                    //{
+                    //    int randomX = rnd.Next(0,displayWidth);
+                    //    int randomY = rnd.Next(0,displayHeight);
 
+                    //    int randomSize = rnd.Next(1,3);
+                    //    dc.DrawEllipse(Brushes.White, )
+                    //}
 
-                    //Draw 
-                    if (mode == 0) drawStartMenu(dc);
-                    else if (mode == 1) drawCircleGrid(dc);
+                        //Draw 
+                        if (mode == 0) drawStartMenu(dc);
+                        else if (mode == 1) drawCircleGrid(dc);
 
                     int penIndex = 0;
                     foreach (Body body in this.bodies)
@@ -446,10 +465,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             if (body.HandLeftState == HandState.Closed && body.HandRightState == HandState.Closed) {
                                 this.bothHandsClosed = true;
+
                             }
                             else if ( body.HandLeftState == HandState.Closed)
                              {
                                 leftHandClosed = true;
+
                              }
                            else   if (body.HandRightState == HandState.Closed)
                             {
@@ -603,13 +624,17 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                         RightWing.Visibility = Visibility.Visible;
                         //if (isLeft) Console.WriteLine("Brian's left angle is " + calcXWingAngle(handPosition,prevXWingPointLeft));
                         //else Console.WriteLine("Brian's right angle is " + calcXWingAngle(handPosition, prevXWingPointRight));
+                        //drawXWing(drawingContext, handPosition.X, handPosition.Y , calcXWingAngle(handPosition));
+
+                        if (isLeft) Console.WriteLine("Brian's left angle is " + calcXWingAngle(handPosition,prevXWingPointLeft));
+                        else Console.WriteLine("Brian's right angle is " + calcXWingAngle(handPosition, prevXWingPointRight));
                     }
                     break;
 
                 case HandState.Open:
                     drawingContext.DrawEllipse(this.handOpenBrush, null, handPosition, HandSize, HandSize);
                     break;
-
+                    
                 case HandState.Lasso:
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
                     break;
@@ -764,8 +789,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             if (this.bothHandsClosed == true)
             {
 
-                if (x > 50 && x < 450 && y > 10 && y < 110) return 1; // Game Option 
-                if (x > 50 && x < 450 && y > 120 && y < 220)
+                if (x > playButton.getX() && x < playButton.getX() + playButton.getWidth() && y < playButton.getY() + playButton.getHeight() && y > playButton.getY())
+                {
+                    Console.WriteLine("Button (X): " + playButton.getX() + " |(Y): " + playButton.getY() + " |(X+W): " + (playButton.getY() + playButton.getWidth()) + " |(Y-H): " + (playButton.getY() - playButton.getHeight()));
+                    Console.WriteLine("Hand (X): " + x + " | (Y): " + y);
+                    return 1; // Game Option 
+                }
+                else if (x > khaledButton.getX() && x < khaledButton.getX() + khaledButton.getWidth() && y < khaledButton.getY() + khaledButton.getHeight() && y > playButton.getY())
                 {
                     MainMode.Visibility = Visibility.Hidden;
                     MainMode.IsEnabled = false;
@@ -777,7 +807,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     return 2;
                 }
 
-                if (x > 50 && x < 450 && y > 230 && y < 330)
+                else if (x > brianButton.getX() && x < brianButton.getX() + brianButton.getWidth() && y < brianButton.getY() + brianButton.getHeight() && y > brianButton.getY())
                 {
                     //Console.WriteLine("BRIAN's MODE");
                     return 3;
@@ -791,13 +821,50 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         public void drawStartMenu(DrawingContext dc)
         {
-            dc.DrawRectangle(Brushes.Yellow, new Pen(Brushes.Red, 6), new Rect(50, 10, 400, 100));
-            dc.DrawRectangle(Brushes.Blue, new Pen(Brushes.Red, 6), new Rect(50, 120, 400, 100));
-            dc.DrawRectangle(Brushes.Green, new Pen(Brushes.Red, 6), new Rect(50, 230, 400, 100));
+            dc.DrawRectangle(playButton.getColor(), playButton.getBorderColor(), playButton.getRect());
+            dc.DrawRectangle(khaledButton.getColor(), khaledButton.getBorderColor(), khaledButton.getRect());
+            dc.DrawRectangle(brianButton.getColor(), brianButton.getBorderColor(), brianButton.getRect());
 
+            var starJedi = new Typeface(new FontFamily(new Uri("pack://application:,,,/"), "/Resources/#Starjedi"), FontStyles.Normal, FontWeights.Regular, FontStretches.Normal);
+
+            FormattedText titleText = new FormattedText(
+                "Deathstar Destroyer",
+                CultureInfo.GetCultureInfo("en-us"),
+                FlowDirection.LeftToRight,
+                new Typeface("Star Jedi Regular"),
+                60,
+                Brushes.Yellow);
+
+            FormattedText playText = new FormattedText(
+                    playButton.getText(),
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Star Jedi Regular"),
+                    32,
+                    playButton.getFontColor());
+
+            FormattedText khaledText = new FormattedText(
+                    khaledButton.getText(),
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Star Jedi Regular"),
+                    32,
+                    khaledButton.getFontColor());
+
+            FormattedText brianText = new FormattedText(
+                    brianButton.getText(),
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Star Jedi Regular"),
+                    32,
+                    brianButton.getFontColor());
+
+            dc.DrawText(titleText, new Point((displayWidth - titleText.WidthIncludingTrailingWhitespace) / 2, 0));
+
+            dc.DrawText(playText, new Point(playButton.getX() + (playButton.getWidth() - playText.WidthIncludingTrailingWhitespace) / 2, playButton.getY() + (playButton.getHeight() - playText.Height) / 2));
+            dc.DrawText(khaledText, new Point(khaledButton.getX() + (khaledButton.getWidth() - khaledText.WidthIncludingTrailingWhitespace) / 2, khaledButton.getY() + (khaledButton.getHeight() - khaledText.Height) / 2));
+            dc.DrawText(brianText, new Point(brianButton.getX() + (brianButton.getWidth() - brianText.WidthIncludingTrailingWhitespace) / 2, brianButton.getY() + (brianButton.getHeight() - brianText.Height) / 2));
         }
-
-
 
         //Create Balloon objects the backGround circles 
         public void createCircleGrid()
@@ -1057,7 +1124,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     20,
                     Brushes.Yellow);
 
-            dc.DrawText(livesText, new Point(0, displayHeight - 70));
+            dc.DrawText(livesText, new Point(0, displayHeight - 90));
             for (int i = 0; i < userLives; i++)
             {
                 drawSkywalker(dc, 0 + i*60, displayHeight - 60);
