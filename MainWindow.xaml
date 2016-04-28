@@ -10,7 +10,7 @@
     <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
     <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2" />
   </Window.Resources>
-  <Grid Margin="10 0 10 0">
+  <Grid  Name="mainGrid" Margin="10 0 10 0">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
@@ -23,27 +23,31 @@
 
 
         <!--<Image Name="wing" Grid.Row="1" HorizontalAlignment="Stretch" Source="/Images/xwing.png"  Width="50" Height="50"/>-->
-       
+
 
         <Viewbox Name="MainMode" Grid.Row="1" HorizontalAlignment="Center">
-            <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
-            
+            <Grid >
+            <Image Source="{Binding ImageSource}" />
+            <Canvas Name="mainModeCanvas" >
+
+                    <Rectangle  Grid.Row="1" Stroke="Black"   VerticalAlignment="Stretch"
+                         Margin="198,80,260,230" Width="50" Height="50" x:Name="leftWing">
+                        <Rectangle.Fill>
+
+                            <ImageBrush ImageSource="D:\lxwing.png" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+
+                </Canvas>
+            </Grid>
+
         </Viewbox>
 
 
-        <Rectangle  Grid.Row="1" Stroke="Black"
-            VerticalAlignment="Stretch"
-           
-            Margin="198,80,260,230" Width="25" Height="25" x:Name="leftWing">
-            <Rectangle.Fill>
-                <!--<Image Name="leftWing"  Source="/Images/xwing.png"  Width="50" Height="50"/>-->
-                <ImageBrush ImageSource="D:\lxwing.png" />
-            </Rectangle.Fill>
-        </Rectangle>
-
         <Rectangle  Grid.Row="1" Stroke="#FF000000" 
-            VerticalAlignment="Stretch"
-            
+            VerticalAlignment="Bottom"
+             HorizontalAlignment="Center" 
+             
             Margin="198,80,260,230" Width="25" Height="25" x:Name="RightWing">
             
             <Rectangle.Fill>
