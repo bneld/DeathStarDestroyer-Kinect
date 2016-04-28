@@ -193,11 +193,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             // Create the drawing group we'll use for drawing
             this.drawingGroup = new DrawingGroup();
 
-            //====================TESTING======================
-            //DrawingContext dc = this.drawingGroup.Open();
-            //drawXWing(dc, 60, 60, 0.0);
-            //====================TESTING======================
-
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
 
@@ -439,10 +434,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
                             
-                            
-                        
-                            this.DrawBody(joints, jointPoints, dc, drawPen);
-
+                            if(this.mode != 1) this.DrawBody(joints, jointPoints, dc, drawPen);
                             
                             //ltrTns.X = jointPoints[JointType.HandLeft].X;
                             //ltrTns.Y = jointPoints[JointType.HandLeft].Y;
@@ -453,9 +445,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                             //       jointPoints[JointType.HandRight].X, this.Height - jointPoints[JointType.HandRight].Y);
                             //ltrTns.X = jointPoints[JointType.HandLeft].X;
                             //ltrTns.Y = jointPoints[JointType.HandLeft].Y;
-                                                       
-
-
 
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc, true);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc, false);
@@ -465,22 +454,22 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             if (body.HandLeftState == HandState.Closed && body.HandRightState == HandState.Closed) {
                                 this.bothHandsClosed = true;
-
+                                this.leftHandClosed = true;
+                                this.rightHandClosed = true;
                             }
                             else if ( body.HandLeftState == HandState.Closed)
-                             {
+                            {
                                 leftHandClosed = true;
-
-                             }
-                           else   if (body.HandRightState == HandState.Closed)
+                            }
+                            else if (body.HandRightState == HandState.Closed)
                             {
                                 rightHandClosed = true;
                             }
-                          else    if(body.HandLeftState == HandState.Lasso )
+                            else if(body.HandLeftState == HandState.Lasso )
                             {
                                 this.leftHandLasso = true;
                             }
-                          else   if(body.HandRightState == HandState.Lasso)
+                            else if(body.HandRightState == HandState.Lasso)
                             {
                                 this.rightHandLasso = true; 
                             }
@@ -490,20 +479,14 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                 this.rightHandClosed = false;
                                 this.rightHandLasso = false;
                                 this.leftHandLasso = false;
-                               
                             }
-                            
-                            //Console.WriteLine("Left " + body.Joints[JointType.HandLeft].Position);
-
                         }
                     }
-                    
                     // prevent drawing outside of our render area
                     this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
                 }
             }
         }
-
      
         /// Draws a body
        /// <param name="joints">joints to draw</param>
@@ -572,15 +555,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         //Draw Circle 
         private void drawCircle( Brush b,  DrawingContext drawingContext, double x , double y , double diameter, int mod)
         {
-
             if (mod == 0) // Normal Circle
             {
-
                 drawingContext.DrawEllipse(b, null, new Point(x, y), 20, 20);
                 drawingContext.DrawImage(new BitmapImage(new Uri(@"Images/spaceship.png", UriKind.RelativeOrAbsolute)), new Rect(x - 28, y - 28, 60, 60));
             }
-          
-
         }
 
         private void drawXWing(DrawingContext dc , double x , double y, double angle, bool isLeft)
@@ -590,16 +569,15 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 leftWing.Visibility = Visibility.Visible;
                 ltrRot.Angle = angle;
-                Canvas.SetLeft(leftWing, x - 195);
-                Canvas.SetTop(leftWing, y - 125);
-                //Console.WriteLine("X: " + x + " Y: " + y);
+                Canvas.SetLeft(leftWing, x - 225);
+                Canvas.SetTop(leftWing, y - 100);
             }
             else
             {
                 RightWing.Visibility = Visibility.Visible;
                 rtrRot.Angle = angle;
-                Canvas.SetLeft(leftWing, x - 195);
-                Canvas.SetTop(leftWing, y - 125);
+                Canvas.SetLeft(RightWing, x - 225);
+                Canvas.SetTop(RightWing, y - 100);
             }
    
         }
@@ -609,7 +587,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             switch (handState)
             {
                 case HandState.Closed:
-                    drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
+                    //drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
 
                     if (this.mode == 0) //start menu
                     {
@@ -622,12 +600,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                         else drawXWing(drawingContext, handPosition.X, handPosition.Y, calcXWingAngle(handPosition, prevXWingPointRight) , false);
                         leftWing.Visibility = Visibility.Visible;
                         RightWing.Visibility = Visibility.Visible;
-                        //if (isLeft) Console.WriteLine("Brian's left angle is " + calcXWingAngle(handPosition,prevXWingPointLeft));
-                        //else Console.WriteLine("Brian's right angle is " + calcXWingAngle(handPosition, prevXWingPointRight));
-                        //drawXWing(drawingContext, handPosition.X, handPosition.Y , calcXWingAngle(handPosition));
-
-                        if (isLeft) Console.WriteLine("Brian's left angle is " + calcXWingAngle(handPosition,prevXWingPointLeft));
-                        else Console.WriteLine("Brian's right angle is " + calcXWingAngle(handPosition, prevXWingPointRight));
                     }
                     break;
 
@@ -644,7 +616,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             else prevXWingPointRight = handPosition;
         }
 
-        public double calcXWingAngle(Point current, Point prev)
+        /*public double calcXWingAngle(Point current, Point prev)
         {
             if (current == null || prev == null) return 0;
 
@@ -681,7 +653,54 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 else return 270;
             }
             else return 0;
+        } */
+        public double calcXWingAngle(Point current, Point prev)
+        {
+            if (current == null || prev == null) return 0;
+
+            double slope = (current.Y - prev.Y) / (current.X - prev.X);
+            double x1 = prev.X;
+            double y1 = prev.Y;
+            double x2 = current.X;
+            double y2 = current.Y;
+
+            if (x2 < x1 && y2 < y1) //angles 180-270
+            {
+                if (slope <= 0.5774) return 180;
+                else if (slope <= 1.732) return 210;
+                else return 240;
+            }
+            else if (x2 < x1 && y2 > y1) //angles 90-180
+            {
+                if (slope >= -0.5774) return 150;
+                else if (slope >= -1.732) return 120;
+                else return 90;
+            }
+            else if (x2 > x1 && y2 > y1) //angles 0-90
+            {
+                if (slope <= 0.5774) return 0;
+                else if (slope <= 1.732) return 30;
+                else return 60;
+            }
+            else if (x2 > x1 && y2 < y1) //angles 270-360
+            {
+                if (slope >= -0.5774) return 330;
+                else if (slope >= -1.732) return 300;
+                else return 270;
+            }
+            else if (y1 == y2)
+            {
+                if (x1 < x2) return 0;
+                else return 180;
+            }
+            else if (x1 == x2)
+            {
+                if (y1 < y2) return 90;
+                else return 270;
+            }
+            else return 0;
         }
+
         private double RadianToDegree(double angle)
         {
             return angle * (180.0 / Math.PI);
@@ -749,7 +768,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         //////////////////////GAME METHODS
 
 
-        private Balloon detectHit(Point LeftHandPositon, Point rightHandPosition , int hand)
+        private void detectHit(Point handPosition)
         {
             // hand = 0; right hand 
             // hand = 1 ; left hand
@@ -757,27 +776,23 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 double pX = backgroundBalloons[i].getXLocation();
                 double pY = backgroundBalloons[i].getYLocation();
-                if (hand == 1)
-                {
-                    if ((distance(LeftHandPositon.X, LeftHandPositon.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
+               
+                    if ((distance(handPosition.X, handPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
                     {
                         backgroundBalloons[i].setExploded(true);
                         userScore++;
                     }
-                }
-                else
-                {
-                    if ((distance(rightHandPosition.X, rightHandPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
-                    {
-                        backgroundBalloons[i].setExploded(true);
-                        userScore++;
-                    }
-                }  
-
-
+               
+                
+                    //if ((distance(rightHandPosition.X, rightHandPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
+                    //{
+                    //    backgroundBalloons[i].setExploded(true);
+                    //    userScore++;
+                    //}
+                 
             }
-            return null;
         }
+
         private double distance(double x1, double y1, double x2, double y2)
         {
             return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
@@ -806,17 +821,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     //Console.WriteLine("KHALED MODE");
                     return 2;
                 }
-
                 else if (x > brianButton.getX() && x < brianButton.getX() + brianButton.getWidth() && y < brianButton.getY() + brianButton.getHeight() && y > brianButton.getY())
                 {
                     //Console.WriteLine("BRIAN's MODE");
                     return 3;
                 }
-
             }
-
             return 0; 
-           
         }
 
         public void drawStartMenu(DrawingContext dc)
@@ -885,9 +896,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                     x += circleDiameter;
                 }
-
                 y += circleDiameter;
-
             }
         }
 
@@ -908,7 +917,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     if (backgroundBalloons[i].getTicks() <= 0)
                     {
-                        //Console.WriteLine(backgroundBalloons[i].getTicks());
                         backgroundBalloons[i].setVisible(false);
                         userLives--;
                     }
@@ -920,8 +928,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                }
             }
 
-            //Console.WriteLine(userLives);
-            
             while (currentBalloonsVisible < maxBalloonsVisible)
             {
                 randomBalloonLocation = rnd.Next(0, backgroundBalloons.Count);
@@ -987,12 +993,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 g.TranslateTransform(-bmp.Width / 2, -bmp.Height / 2); //restore rotation point into the matrix
                 g.DrawImage(bmp, new System.Drawing.Point(0, 0)); //draw the image on the new bitmap
             }
-
             return rotatedImage;
         }
 
-
-        
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
             if (this.mode != 1)
@@ -1021,9 +1024,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             else if (this.mode == 1) // Game Mode 
             {
                 if(this.leftHandClosed)
-                    detectHit(leftHandPosition, rightHandPosition, 1);
-                else if (this.rightHandClosed)
-                    detectHit(leftHandPosition, rightHandPosition, 0);
+                    detectHit(leftHandPosition);
+                if (this.rightHandClosed)
+                    detectHit(rightHandPosition);
                 drawCircleGrid(dc);
                 timeKeeper(dc);
                 drawLives(dc);
@@ -1038,13 +1041,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     if (this.leftHandClosed = true && this.rightHandLasso == true )
                     {
                         takeScreenshot(dc );
-                       
-                        
                     }
                 }
                 else if (this.kMode == 1)
                 {
-
                     //  dc.DrawImage(this.userPhotoBitmap, new Rect(0, 0 , this.Width,this.Height));
 
                     Uri imageUri = new Uri(userPhotoPath, UriKind.Relative);
@@ -1178,7 +1178,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                     khaledLineImage.Points.Add(new System.Windows.Point { X = x, Y = y });
                                   
                                 }
-                                
                             }
                         }
                     }
