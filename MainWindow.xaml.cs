@@ -26,7 +26,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
     using System.Drawing.Drawing2D;
     using System.Threading.Tasks;
     using System.Reflection;
-
+    using System.Drawing.Imaging;
     /// <summary>
     /// Interaction logic for MainWindow
     /// </summary>
@@ -429,8 +429,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                             //             jointPoints[JointType.HandLeft].X, this.Height - jointPoints[JointType.HandLeft].Y);
                             //RightWing.Margin = new Thickness(this.Width - jointPoints[JointType.HandRight].X, jointPoints[JointType.HandRight].Y,
                             //       jointPoints[JointType.HandRight].X, this.Height - jointPoints[JointType.HandRight].Y);
+                            //ltrTns.X = jointPoints[JointType.HandLeft].X;
+                            //ltrTns.Y = jointPoints[JointType.HandLeft].Y;
+                                                       
 
-                            
+
 
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc, true);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc, false);
@@ -561,51 +564,22 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         private void drawXWing(DrawingContext dc , double x , double y, double angle)
         {
-            //BitmapImage xa = new BitmapImage(new Uri(@"Images/xwing.png", UriKind.RelativeOrAbsolute));
-
-            //System.Drawing.Bitmap image1 = (System.Drawing.Bitmap)Image.FromFile(@"C:\Documents and Settings\" +
-            //  @"All Users\Documents\My Music\music.bmp");
-            //String dir = Path.GetDirectoryName(Application.ExecutablePath);
-            //String filename = Path.Combine(dir, @"MyImage.jpg");
-            //System.Drawing.Bitmap b = new System.Drawing.Bitmap(System.Drawing.Image.FromFile("xwing.png"));
-            // System.Drawing.Bitmap b = new System.Drawing.Bitmap("xwing.png");
-
-            //dc.DrawEllipse(null, null, new Point(x, y), 20, 20);
-            //dc.DrawImage(b, new Rect(x - 28, y - 28, 60, 60));
-
-        
-
-            var overlayImage = new BitmapImage(new Uri("Images/xwing.png", UriKind.RelativeOrAbsolute));
-            dc.DrawImage(overlayImage,
-                                      new Rect(x, y, overlayImage.Width, overlayImage.Height));
-
-            //dc2.DrawImage(b, 0, 0);
-
-            //System.Drawing.Bitmap image1 = new System.Drawing.Bitmap("D:\\image.png");
-            //RotateImage(image1, 60);
-            //dc.DrawEllipse(null, null, new Point(x, y), 20, 20);
-            // dc.DrawImage(Bitmap2BitmapImage(image1), new Rect(x - 28, y - 28, 60, 60));
-            var outPutDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-
-            var logoimage = Path.Combine(outPutDirectory, "Images\\xwing.png");
-
-
-            BitmapImage overlayIamge = new BitmapImage(new Uri(logoimage, UriKind.RelativeOrAbsolute));
-          //  leftWing = new System.Windows.Shapes.Rectangle();
-            dc.DrawImage(overlayIamge, new Rect(x, y, 30, 30));
+            
+            ltrRot.Angle = angle;
+           Canvas.SetLeft(leftWing, x - 195 );
+           Canvas.SetTop(leftWing, y - 145 );
+           Console.WriteLine("X: " + x + " Y: " + y);
+           
             
 
-
-           
         }
 
-      
 
-        /// <summary>
-        /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
-        /// </summary>
        
-        /// 
+
+
+
+
         private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext, Boolean isLeft)
         {
             switch (handState)
