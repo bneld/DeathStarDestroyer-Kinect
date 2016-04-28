@@ -29,9 +29,23 @@
                          Margin="198,80,260,230" Width="50" Height="50" x:Name="leftWing">
                         <Rectangle.Fill>
 
-                            <ImageBrush ImageSource="D:\lxwing.png" />
+                            <ImageBrush ImageSource="C:\lxwing.png" />
                         </Rectangle.Fill>
                     </Rectangle>
+
+
+                    <Rectangle  Grid.Row="1" Stroke="#FF000000" 
+            VerticalAlignment="Bottom"
+             HorizontalAlignment="Center" 
+             
+            Margin="198,80,260,230" Width="50" Height="50" x:Name="RightWing">
+
+                        <Rectangle.Fill>
+                            <!--<Image Name="leftWing"  Source="/Images/xwing.png"  Width="50" Height="50"/>-->
+                            <ImageBrush ImageSource="C:\rxwing.png" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+
 
                 </Canvas>
             </Grid>
@@ -39,17 +53,17 @@
         </Viewbox>
 
 
-        <Rectangle  Grid.Row="1" Stroke="#FF000000" 
+        <!--<Rectangle  Grid.Row="1" Stroke="#FF000000" 
             VerticalAlignment="Bottom"
              HorizontalAlignment="Center" 
              
             Margin="198,80,260,230" Width="25" Height="25" x:Name="RightWing">
             
             <Rectangle.Fill>
-                <!--<Image Name="leftWing"  Source="/Images/xwing.png"  Width="50" Height="50"/>-->
-                <ImageBrush ImageSource="D:\rxwing.png" />
+                --><!--<Image Name="leftWing"  Source="/Images/xwing.png"  Width="50" Height="50"/>--><!--
+                <ImageBrush ImageSource="C:\Users\Brian\Documents\lxwing.png" />
             </Rectangle.Fill>
-        </Rectangle>
+        </Rectangle>-->
 
 
 
