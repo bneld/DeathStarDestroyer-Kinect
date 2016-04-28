@@ -95,10 +95,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 
         private int timeCounter = 0;
+        private int timeCounterInSeconds = 0;
         private int maxBalloonsVisible;
         private int currentBalloonsVisible;
         private Random rnd = new Random();
         private int userScore = 0;
+        private int userLives = 5;
 
         private Boolean countdown = true;
         private Boolean startTimer = true;
@@ -488,6 +490,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         //Draw Circle 
         private void drawCircle( Brush b,  DrawingContext drawingContext, double x , double y , double diameter, int mod)
         {
+
             if (mod == 0) // Normal Circle
             {
 
@@ -793,7 +796,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
             //Console.Clear();
 
-            maxBalloonsVisible = 5;
+            maxBalloonsVisible = 1 + timeCounterInSeconds/15;
             currentBalloonsVisible = 0;
 
             int randomBalloonLocation = 0;
@@ -802,15 +805,29 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             for (int i = 0; i < backgroundBalloons.Count; i++)
             {
                 if (backgroundBalloons[i].getVisible())
-                    currentBalloonsVisible++;
+                {
+                    if (backgroundBalloons[i].getTicks() <= 0)
+                    {
+                        Console.WriteLine(backgroundBalloons[i].getTicks());
+                        backgroundBalloons[i].setVisible(false);
+                        userLives--;
+                    }
+                    else
+                    {
+                        backgroundBalloons[i].decrementTicks();
+                        currentBalloonsVisible++;
+                    }
+               }
             }
+
+            //Console.WriteLine(userLives);
             
             while (currentBalloonsVisible < maxBalloonsVisible)
             {
                 randomBalloonLocation = rnd.Next(0, backgroundBalloons.Count);
 
                 backgroundBalloons[randomBalloonLocation].setVisible(true);
-
+                backgroundBalloons[randomBalloonLocation].setTicks(300 / (1 + timeCounterInSeconds/ 30));
                 currentBalloonsVisible++;
             }
 
@@ -883,21 +900,25 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 this.khaledMode.Visibility = Visibility.Hidden;
                 this.khaledLine.Points.Clear();   
                 this.MainMode.Visibility = Visibility.Visible;
-                
+                this.userLives = 5;
             }
             else if (this.mode == 0)//Main Menu Selection
             {
                 this.mode = checkUserSelection(rightHandPosition.X, rightHandPosition.Y);
                 timeCounter = 0;
+                timeCounterInSeconds = 0;
                 userScore = 0;
+                userLives = 5;
             }
             else if (this.mode == 1)
             {
                 detectHit(leftHandPosition, rightHandPosition);
                 drawCircleGrid(dc);
-                timeCounter++;
-                Console.WriteLine(timeCounter / 30);
                 timeKeeper(dc);
+                drawLives(dc);
+                if (userLives <= 0)
+                    this.mode = 0;
+                
             }
             else if (this.mode == 2)// Khaled Mode 
             {
@@ -920,7 +941,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         ///
         private void timeKeeper(DrawingContext drawingContext){
-            String time = Convert.ToString(timeCounter / 30);
+            String time = Convert.ToString(timeCounterInSeconds);
             FormattedText timeText = new FormattedText(
                     time,
                     CultureInfo.GetCultureInfo("en-us"),
@@ -929,7 +950,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     32,
                     Brushes.White);
 
-            drawingContext.DrawText(timeText, new Point((displayWidth / 2) - (timeText.WidthIncludingTrailingWhitespace / 2), timeText.Height));
+            drawingContext.DrawText(timeText, new Point((displayWidth / 2) - (timeText.WidthIncludingTrailingWhitespace / 2), 10));
 
             String score = Convert.ToString(userScore);
 
@@ -941,10 +962,38 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     40,
                     Brushes.Green);
 
-            drawingContext.DrawText(scoreText, new Point((displayWidth / 2) - (scoreText.WidthIncludingTrailingWhitespace / 2), displayHeight - scoreText.Height));
+            drawingContext.DrawText(scoreText, new Point((displayWidth) - (scoreText.WidthIncludingTrailingWhitespace), displayHeight - scoreText.Height));
+
+            timeCounter++;
+            timeCounterInSeconds = timeCounter / 30;
         }
 
+        private void drawSkywalker(DrawingContext drawingContext, double x, double y)
+        {
+            //drawingContext.DrawEllipse(b, null, new Point(x, y), 20, 20);
+            //BitmapImage xImage = new BitmapImage(new Uri(@"Images\\spaceship.png", UriKind.Relative));
+            // xImage.Rotation = 
+            drawingContext.DrawImage(new BitmapImage(new Uri(@"Images/rebelLogo.png", UriKind.RelativeOrAbsolute)), new Rect(x, y, 55, 55));
+            drawingContext.DrawImage(new BitmapImage(new Uri(@"Images/skywalker.png", UriKind.RelativeOrAbsolute)), new Rect(x+5, y+10, 45, 45));
 
+        }
+
+        private void drawLives(DrawingContext dc)
+        {
+            FormattedText livesText = new FormattedText(
+                    "LIVES:",
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Helvetica"),
+                    20,
+                    Brushes.Yellow);
+
+            dc.DrawText(livesText, new Point(0, displayHeight - 70));
+            for (int i = 0; i < userLives; i++)
+            {
+                drawSkywalker(dc, 0 + i*60, displayHeight - 60);
+            }
+        }
 
        ///Khaled's Methods 
         private void ColorReader_FrameArrived(object sender, ColorFrameArrivedEventArgs e)

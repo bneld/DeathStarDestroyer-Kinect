@@ -32,6 +32,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.explosionRadius = 5;
             this.explosionOpacity = 1.0;
 
+            this.ticks = ticks;
+
         }
 
         public double getXLocation()
@@ -88,6 +90,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         public void setVisible(Boolean v)
         {
             visible = v;
+            if (v)
+            {
+                this.setExploded(false);
+                explosionRadius = 5;
+            }
         }
 
         public void setTicks(int ticks)
