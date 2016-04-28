@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MAIN GAME" 
-        Height="1920" Width="1080" 
+        Height="1080" Width="1920" 
+
         Loaded="MainWindow_Loaded"
          Closing="MainWindow_Closing"> 
   <Window.Resources>
@@ -27,6 +28,7 @@
 
         <Viewbox Name="MainMode" Grid.Row="1" HorizontalAlignment="Center">
             <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+
             
         </Viewbox>
 
@@ -72,9 +74,11 @@
         </Viewbox>
 
 
-        <Viewbox Grid.Row="1">  <!--KHLAED MODE --> 
-            <Grid Height="1920" Width="1080">
-                <Image Name="khaledMode" Stretch="UniformToFill" />
+       
+        <Viewbox Grid.Row="1">  <!--CAMERA ,KHLAED MODE --> 
+            <Grid Width="1920" Height="1080">
+                <Image Name="khaledMode" />
+
                 <Canvas Name="canvas">
                         <Polyline Name="khaledLine" Stroke="Red" StrokeThickness="15">
                         <Polyline.Effect>

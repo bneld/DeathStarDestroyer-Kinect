@@ -69,7 +69,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private int displayHeight;
         private List<Pen> bodyColors;
         private string statusText = null;
-        
+        private Point prevXWingPointLeft;
+        private Point prevXWingPointRight;
+
         private List<Balloon> balloons;
         private bool bothHandsClosed = false;
         private bool rightHandClosed = false;
@@ -94,13 +96,16 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 
         private int timeCounter = 0;
+        private int timeCounterInSeconds = 0;
         private int maxBalloonsVisible;
         private int currentBalloonsVisible;
         private Random rnd = new Random();
         private int userScore = 0;
+        private int userLives = 5;
 
         private Boolean countdown = true;
         private Boolean startTimer = true;
+
         private Point prevXWingPoint;
         private BitmapImage userPhotoBitmap;
 
@@ -124,7 +129,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// </summary>
         public MainWindow()
         {
-        
+           
+
             // one sensor is currently supported
             this.kinectSensor = KinectSensor.GetDefault();
 
@@ -179,6 +185,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             // Create the drawing group we'll use for drawing
             this.drawingGroup = new DrawingGroup();
+
+            //====================TESTING======================
+            //DrawingContext dc = this.drawingGroup.Open();
+            //drawXWing(dc, 60, 60, 0.0);
+            //====================TESTING======================
 
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
@@ -296,6 +307,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             
             leftWing.RenderTransform = ltrGrp;
             RightWing.RenderTransform = rtrGrp;
+            ltrRot.Angle = 60;
+
            
             //lSclX.Value = slSclY.Value = 1;
             if (this.bodyFrameReader != null)
@@ -407,10 +420,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                             
                         
                             this.DrawBody(joints, jointPoints, dc, drawPen);
-                            this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
+
+                            
                             //ltrTns.X = jointPoints[JointType.HandLeft].X;
                             //ltrTns.Y = jointPoints[JointType.HandLeft].Y;
-                            // Draw the xWing along the hand 
+                            //Draw the xWing along the hand 
                             //leftWing.Margin = new Thickness(this.Width - jointPoints[JointType.HandLeft].X, jointPoints[JointType.HandLeft].Y,
                             //             jointPoints[JointType.HandLeft].X, this.Height - jointPoints[JointType.HandLeft].Y);
                             //RightWing.Margin = new Thickness(this.Width - jointPoints[JointType.HandRight].X, jointPoints[JointType.HandRight].Y,
@@ -418,7 +432,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             
 
-                            this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
+                            this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc, true);
+                            this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc, false);
+
                             this.startGame(dc, jointPoints[JointType.HandLeft], jointPoints[JointType.HandRight]);
                             //this.drawCircles(body.HandRightState, jointPoints[JointType.HandRight], dc);
 
@@ -532,6 +548,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         //Draw Circle 
         private void drawCircle( Brush b,  DrawingContext drawingContext, double x , double y , double diameter, int mod)
         {
+
             if (mod == 0) // Normal Circle
             {
 
@@ -546,6 +563,24 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
             //BitmapImage xa = new BitmapImage(new Uri(@"Images/xwing.png", UriKind.RelativeOrAbsolute));
 
+            //System.Drawing.Bitmap image1 = (System.Drawing.Bitmap)Image.FromFile(@"C:\Documents and Settings\" +
+            //  @"All Users\Documents\My Music\music.bmp");
+            //String dir = Path.GetDirectoryName(Application.ExecutablePath);
+            //String filename = Path.Combine(dir, @"MyImage.jpg");
+            //System.Drawing.Bitmap b = new System.Drawing.Bitmap(System.Drawing.Image.FromFile("xwing.png"));
+            // System.Drawing.Bitmap b = new System.Drawing.Bitmap("xwing.png");
+
+            //dc.DrawEllipse(null, null, new Point(x, y), 20, 20);
+            //dc.DrawImage(b, new Rect(x - 28, y - 28, 60, 60));
+
+        
+
+            var overlayImage = new BitmapImage(new Uri("Images/xwing.png", UriKind.RelativeOrAbsolute));
+            dc.DrawImage(overlayImage,
+                                      new Rect(x, y, overlayImage.Width, overlayImage.Height));
+
+            //dc2.DrawImage(b, 0, 0);
+
             //System.Drawing.Bitmap image1 = new System.Drawing.Bitmap("D:\\image.png");
             //RotateImage(image1, 60);
             //dc.DrawEllipse(null, null, new Point(x, y), 20, 20);
@@ -556,19 +591,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 
             BitmapImage overlayIamge = new BitmapImage(new Uri(logoimage, UriKind.RelativeOrAbsolute));
-            leftWing = new System.Windows.Shapes.Rectangle();
+          //  leftWing = new System.Windows.Shapes.Rectangle();
             dc.DrawImage(overlayIamge, new Rect(x, y, 30, 30));
             
 
 
            
-            
-
-            //var transform = this.MyImage.RenderTransform as CompositeTransform;
-            //var currentScaleX = transform.ScaleX;
-            //var angle = transform.Rotation;
-            //var offsetX = transform.TranslateX;
-
         }
 
       
@@ -578,16 +606,28 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// </summary>
        
         /// 
-        private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext)
+        private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext, Boolean isLeft)
         {
-           switch (handState)
+            switch (handState)
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
                     
                      if(this.mode == 1)  drawXWing(drawingContext, handPosition.X, handPosition.Y, 44.0);
 
+                    if (this.mode == 0) //start menu
+                    {
+                        drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
+                        drawCircle(Brushes.Blue, drawingContext, handPosition.X, handPosition.Y, 25, 1);
+                    }
+                    else if (this.mode == 1) //primary game mode
+                    {
+                        //drawXWing(drawingContext, handPosition.X, handPosition.Y , calcXWingAngle(handPosition));
 
+
+                        if (isLeft) Console.WriteLine("Brian's left angle is " + calcXWingAngle(handPosition,prevXWingPointLeft));
+                        else Console.WriteLine("Brian's right angle is " + calcXWingAngle(handPosition, prevXWingPointRight));
+                    }
                     break;
 
                 case HandState.Open:
@@ -598,7 +638,52 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
                     break;
             }
-            prevXWingPoint = handPosition;
+
+            if (isLeft) prevXWingPointLeft = handPosition;
+            else prevXWingPointRight = handPosition;
+        }
+
+        public double calcXWingAngle(Point current, Point prev)
+        {
+            if (current == null || prev == null) return 0;
+
+            double slope = (current.Y - prev.Y) / (current.X - prev.X);
+            double x1 = prev.X;
+            double y1 = prev.Y;
+            double x2 = current.X;
+            double y2 = current.Y;
+
+            if (x2 < x1 && y2 < y1)
+            {
+                return 180 + RadianToDegree(Math.Atan(slope));
+            }
+            else if (x2 < x1 && y2 > y1)
+            {
+                return 180 - RadianToDegree(Math.Atan(slope));
+            }
+            else if (x2 > x1 && y2 > y1)
+            {
+                return RadianToDegree(Math.Atan(slope));
+            }
+            else if (x2 > x1 && y2 < y1)
+            {
+                return -RadianToDegree(Math.Atan(slope));
+            }
+            else if (y1 == y2)
+            {
+                if (x1 < x2) return 0;
+                else return 180;
+            }
+            else if (x1 == x2)
+            {
+                if (y1 < y2) return 90;
+                else return 270;
+            }
+            else return 0;
+        }
+        private double RadianToDegree(double angle)
+        {
+            return angle * (180.0 / Math.PI);
         }
 
         public double calclXWingAngle(System.Windows.Point p)
@@ -771,7 +856,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
             //Console.Clear();
 
-            maxBalloonsVisible = 5;
+            maxBalloonsVisible = 1 + timeCounterInSeconds/15;
             currentBalloonsVisible = 0;
 
             int randomBalloonLocation = 0;
@@ -780,15 +865,29 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             for (int i = 0; i < backgroundBalloons.Count; i++)
             {
                 if (backgroundBalloons[i].getVisible())
-                    currentBalloonsVisible++;
+                {
+                    if (backgroundBalloons[i].getTicks() <= 0)
+                    {
+                        Console.WriteLine(backgroundBalloons[i].getTicks());
+                        backgroundBalloons[i].setVisible(false);
+                        userLives--;
+                    }
+                    else
+                    {
+                        backgroundBalloons[i].decrementTicks();
+                        currentBalloonsVisible++;
+                    }
+               }
             }
+
+            //Console.WriteLine(userLives);
             
             while (currentBalloonsVisible < maxBalloonsVisible)
             {
                 randomBalloonLocation = rnd.Next(0, backgroundBalloons.Count);
 
                 backgroundBalloons[randomBalloonLocation].setVisible(true);
-
+                backgroundBalloons[randomBalloonLocation].setTicks(300 / (1 + timeCounterInSeconds/ 30));
                 currentBalloonsVisible++;
             }
 
@@ -865,21 +964,25 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 this.khaledModeImage.Visibility = Visibility.Hidden;
                 this.khaledLineImage.Points.Clear();   
                 this.MainMode.Visibility = Visibility.Visible;
-                
+                this.userLives = 5;
             }
             else if (this.mode == 0)//Main Menu Selection
             {
                 this.mode = checkUserSelection(rightHandPosition.X, rightHandPosition.Y);
                 timeCounter = 0;
+                timeCounterInSeconds = 0;
                 userScore = 0;
+                userLives = 5;
             }
             else if (this.mode == 1) // Game Mode 
             {
                 detectHit(leftHandPosition, rightHandPosition);
                 drawCircleGrid(dc);
-                timeCounter++;
-                Console.WriteLine(timeCounter / 30);
                 timeKeeper(dc);
+                drawLives(dc);
+                if (userLives <= 0)
+                    this.mode = 0;
+                
             }
             else if (this.mode == 2)// Khaled Mode 
             {
@@ -920,7 +1023,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         ///
         private void timeKeeper(DrawingContext drawingContext){
-            String time = Convert.ToString(timeCounter / 30);
+            String time = Convert.ToString(timeCounterInSeconds);
             FormattedText timeText = new FormattedText(
                     time,
                     CultureInfo.GetCultureInfo("en-us"),
@@ -929,7 +1032,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     32,
                     Brushes.White);
 
-            drawingContext.DrawText(timeText, new Point((displayWidth / 2) - (timeText.WidthIncludingTrailingWhitespace / 2), timeText.Height));
+            drawingContext.DrawText(timeText, new Point((displayWidth / 2) - (timeText.WidthIncludingTrailingWhitespace / 2), 10));
 
             String score = Convert.ToString(userScore);
 
@@ -941,10 +1044,45 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     40,
                     Brushes.Green);
 
-            drawingContext.DrawText(scoreText, new Point((displayWidth / 2) - (scoreText.WidthIncludingTrailingWhitespace / 2), displayHeight - scoreText.Height));
+            drawingContext.DrawText(scoreText, new Point((displayWidth) - (scoreText.WidthIncludingTrailingWhitespace), displayHeight - scoreText.Height));
+
+            timeCounter++;
+            timeCounterInSeconds = timeCounter / 30;
         }
 
+        private void drawSkywalker(DrawingContext drawingContext, double x, double y)
+        {
+            //drawingContext.DrawEllipse(b, null, new Point(x, y), 20, 20);
+            //BitmapImage xImage = new BitmapImage(new Uri(@"Images\\spaceship.png", UriKind.Relative));
+            // xImage.Rotation = 
 
+            var outPutDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+            var rebelPath = Path.Combine(outPutDirectory, "Images\\rebelLogo.png");
+            BitmapImage rebelLogo = new BitmapImage(new Uri(rebelPath, UriKind.RelativeOrAbsolute));
+            var skywalkerPath = Path.Combine(outPutDirectory, "Images\\skywalker.png");
+            BitmapImage skywalker = new BitmapImage(new Uri(rebelPath, UriKind.RelativeOrAbsolute));
+
+            drawingContext.DrawImage(rebelLogo, new Rect(x, y, 55, 55));
+            drawingContext.DrawImage(skywalker, new Rect(x+5, y+10, 45, 45));
+
+        }
+
+        private void drawLives(DrawingContext dc)
+        {
+            FormattedText livesText = new FormattedText(
+                    "LIVES:",
+                    CultureInfo.GetCultureInfo("en-us"),
+                    FlowDirection.LeftToRight,
+                    new Typeface("Helvetica"),
+                    20,
+                    Brushes.Yellow);
+
+            dc.DrawText(livesText, new Point(0, displayHeight - 70));
+            for (int i = 0; i < userLives; i++)
+            {
+                drawSkywalker(dc, 0 + i*60, displayHeight - 60);
+            }
+        }
 
        ///Khaled's Methods 
         private void ColorReader_FrameArrived(object sender, ColorFrameArrivedEventArgs e)
