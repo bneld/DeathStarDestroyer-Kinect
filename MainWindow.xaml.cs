@@ -253,7 +253,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
             //BackgroundPic.IsEnabled = false;
             //BackgroundPic.Visibility = Visibility.Hidden;
-           
+          
+
         }
 
         
@@ -304,11 +305,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         /// <param name="e">event arguments</param>
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            
+            ltrRot.CenterX = 25;
+            ltrRot.CenterY = 25;
+            rtrRot.CenterX = 25;
+            rtrRot.CenterY = 25;
+     
             leftWing.RenderTransform = ltrGrp;
             RightWing.RenderTransform = rtrGrp;
-            ltrRot.Angle = 60;
-
            
             //lSclX.Value = slSclY.Value = 1;
             if (this.bodyFrameReader != null)
@@ -443,17 +446,14 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                             if (body.HandLeftState == HandState.Closed && body.HandRightState == HandState.Closed) {
                                 this.bothHandsClosed = true;
-                                Console.WriteLine("Both Hands are  closed");   
                             }
                             else if ( body.HandLeftState == HandState.Closed)
                              {
                                 leftHandClosed = true;
-                                Console.WriteLine("Left Hand Closed");
                              }
                            else   if (body.HandRightState == HandState.Closed)
                             {
                                 rightHandClosed = true;
-                                Console.WriteLine("Rigt Hand CLosed ");
                             }
                           else    if(body.HandLeftState == HandState.Lasso )
                             {
@@ -562,23 +562,26 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         }
 
-        private void drawXWing(DrawingContext dc , double x , double y, double angle)
+        private void drawXWing(DrawingContext dc , double x , double y, double angle, bool isLeft)
         {
-            
-            ltrRot.Angle = angle;
-           Canvas.SetLeft(leftWing, x - 195 );
-           Canvas.SetTop(leftWing, y - 145 );
-           Console.WriteLine("X: " + x + " Y: " + y);
-           
-            
-
+            Console.WriteLine("Angle: " + angle);
+            if (isLeft)
+            {
+                leftWing.Visibility = Visibility.Visible;
+                ltrRot.Angle = angle;
+                Canvas.SetLeft(leftWing, x - 195);
+                Canvas.SetTop(leftWing, y - 125);
+                //Console.WriteLine("X: " + x + " Y: " + y);
+            }
+            else
+            {
+                RightWing.Visibility = Visibility.Visible;
+                rtrRot.Angle = angle;
+                Canvas.SetLeft(leftWing, x - 195);
+                Canvas.SetTop(leftWing, y - 125);
+            }
+   
         }
-
-
-       
-
-
-
 
         private void DrawHand(HandState handState, Point handPosition, DrawingContext drawingContext, Boolean isLeft)
         {
@@ -586,8 +589,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 case HandState.Closed:
                     drawingContext.DrawEllipse(this.handClosedBrush, null, handPosition, HandSize, HandSize);
-                    
-                     if(this.mode == 1)  drawXWing(drawingContext, handPosition.X, handPosition.Y, 44.0);
 
                     if (this.mode == 0) //start menu
                     {
@@ -596,11 +597,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     }
                     else if (this.mode == 1) //primary game mode
                     {
-                        //drawXWing(drawingContext, handPosition.X, handPosition.Y , calcXWingAngle(handPosition));
-
-
-                        if (isLeft) Console.WriteLine("Brian's left angle is " + calcXWingAngle(handPosition,prevXWingPointLeft));
-                        else Console.WriteLine("Brian's right angle is " + calcXWingAngle(handPosition, prevXWingPointRight));
+                        if (isLeft) drawXWing(drawingContext, handPosition.X, handPosition.Y , calcXWingAngle(handPosition, prevXWingPointLeft), true);
+                        else drawXWing(drawingContext, handPosition.X, handPosition.Y, calcXWingAngle(handPosition, prevXWingPointRight) , false);
+                        leftWing.Visibility = Visibility.Visible;
+                        RightWing.Visibility = Visibility.Visible;
+                        //if (isLeft) Console.WriteLine("Brian's left angle is " + calcXWingAngle(handPosition,prevXWingPointLeft));
+                        //else Console.WriteLine("Brian's right angle is " + calcXWingAngle(handPosition, prevXWingPointRight));
                     }
                     break;
 
@@ -660,10 +662,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             return angle * (180.0 / Math.PI);
         }
 
-        public double calclXWingAngle(System.Windows.Point p)
-        {
-            return 0;
-        }
         /// <summary>
         /// Draws indicators to show which edges are clipping body data
         /// </summary>
@@ -723,13 +721,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         }
 
 
-        
-
-
-
-
         //////////////////////GAME METHODS
-
 
 
         private Balloon detectHit(Point LeftHandPositon, Point rightHandPosition , int hand)
@@ -781,13 +773,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     
                     khaledMode.Visibility = Visibility.Visible;
                     khaledMode.IsEnabled = true;
-                    Console.WriteLine("KHALED MODE");
+                    //Console.WriteLine("KHALED MODE");
                     return 2;
                 }
 
                 if (x > 50 && x < 450 && y > 230 && y < 330)
                 {
-                    Console.WriteLine("BRIAN's MODE");
+                    //Console.WriteLine("BRIAN's MODE");
                     return 3;
                 }
 
@@ -849,7 +841,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     if (backgroundBalloons[i].getTicks() <= 0)
                     {
-                        Console.WriteLine(backgroundBalloons[i].getTicks());
+                        //Console.WriteLine(backgroundBalloons[i].getTicks());
                         backgroundBalloons[i].setVisible(false);
                         userLives--;
                     }
@@ -936,7 +928,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         
         public void startGame(DrawingContext dc , Point leftHandPosition , Point rightHandPosition  )
         {
-
+            if (this.mode != 1)
+            {
+                leftWing.Visibility = Visibility.Hidden;
+                RightWing.Visibility = Visibility.Hidden;
+            }
             if (this.rightHandLasso == true && this.leftHandLasso == true)
 
             {
@@ -957,9 +953,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
             else if (this.mode == 1) // Game Mode 
             {
-                if(this.leftHandClosed == true )
+                if(this.leftHandClosed)
                     detectHit(leftHandPosition, rightHandPosition, 1);
-                if (this.rightHandClosed)
+                else if (this.rightHandClosed)
                     detectHit(leftHandPosition, rightHandPosition, 0);
                 drawCircleGrid(dc);
                 timeKeeper(dc);
