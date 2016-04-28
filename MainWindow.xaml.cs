@@ -695,23 +695,30 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
 
 
-        private Balloon detectHit(Point LeftHandPositon, Point rightHandPosition )
+        private Balloon detectHit(Point LeftHandPositon, Point rightHandPosition , int hand)
         {
+            // hand = 0; right hand 
+            // hand = 1 ; left hand
             for(int i = 0; i < backgroundBalloons.Count; i++)
             {
                 double pX = backgroundBalloons[i].getXLocation();
                 double pY = backgroundBalloons[i].getYLocation();
-                if ((distance(LeftHandPositon.X, LeftHandPositon.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
+                if (hand == 1)
                 {
-                    backgroundBalloons[i].setExploded(true);
-                    userScore++;
+                    if ((distance(LeftHandPositon.X, LeftHandPositon.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
+                    {
+                        backgroundBalloons[i].setExploded(true);
+                        userScore++;
+                    }
                 }
-                if ((distance(rightHandPosition.X, rightHandPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
+                else
                 {
-                    backgroundBalloons[i].setExploded(true);
-                    userScore++;
-                }
-                    
+                    if ((distance(rightHandPosition.X, rightHandPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
+                    {
+                        backgroundBalloons[i].setExploded(true);
+                        userScore++;
+                    }
+                }  
 
 
             }
@@ -893,7 +900,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
             else if (this.mode == 1)
             {
-                detectHit(leftHandPosition, rightHandPosition);
+                if(this.leftHandClosed == true )
+                    detectHit(leftHandPosition, rightHandPosition, 1);
+                if (this.rightHandClosed)
+                    detectHit(leftHandPosition, rightHandPosition, 0);
                 drawCircleGrid(dc);
                 timeCounter++;
                 Console.WriteLine(timeCounter / 30);
