@@ -3,27 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MAIN GAME" 
         Height="1080" Width="1920" 
-
+        WindowState="Maximized"
         Loaded="MainWindow_Loaded"
-         Closing="MainWindow_Closing"> 
-  <Window.Resources>
-    <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
-    <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
-    <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2" />
-  </Window.Resources>
-  <Grid  Name="mainGrid" Margin="10 0 10 0">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    <!--<TextBlock Grid.Row="0" Margin="0 0 -1 0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Helvetica" FontSize="18">KINNECT</TextBlock>-->
-        <!--<Viewbox Name="BP" Grid.Row="1" HorizontalAlignment="Center">
-            <Image Source="C:\Users\Brian\Documents\GitHub\Kinnnect\Images\1.jpg" Stretch="UniformToFill" />
-        </Viewbox>-->
-
-
-        <!--<Image Name="wing" Grid.Row="1" HorizontalAlignment="Stretch" Source="/Images/xwing.png"  Width="50" Height="50"/>-->
+         Closing="MainWindow_Closing">
+    <Window.Resources>
+        <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
+        <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
+        <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2" />
+    </Window.Resources>
+    <Grid  Name="mainGrid" Margin="10 0 10 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
 
         <Viewbox Name="MainMode" Grid.Row="1" HorizontalAlignment="Center">
@@ -40,13 +33,12 @@
                         Margin="198,80,260,230" Width="50" Height="50" x:Name="RightWing">
                         <Rectangle.Fill>
                             <!--<Image Name="leftWing"  Source="/Images/xwing.png"  Width="50" Height="50"/>-->
-                            <ImageBrush ImageSource="C:\Users\Brian\Documents\rxwing.png" />
+                            <ImageBrush ImageSource="D:\rxwing.png" />
                         </Rectangle.Fill>
                     </Rectangle>
                 </Canvas>
             </Grid>
         </Viewbox>
-
         <!--<Rectangle  Grid.Row="1" Stroke="#FF000000" 
             VerticalAlignment="Bottom"
              HorizontalAlignment="Center" 
@@ -62,14 +54,48 @@
 
 
 
+        <!-- KHALED MODE -->
+        <Viewbox Grid.Row="1">
+            <!--CAMERA ,KHLAED MODE -->
+            <Grid Width="1920" Height="1080">
+                <Canvas Name="cameracanvas"  >
+                    <Image Name="khaledMode"   />
+                    <Polyline Name="khaledLine" Stroke="Red" StrokeThickness="15">
+                        <Polyline.Effect>
+                            <BlurEffect  Radius="30" />
+                        </Polyline.Effect>
+                    </Polyline>
+                </Canvas>
+            </Grid>
+        </Viewbox>
+
 
         <Viewbox Grid.Row="1">
-            <!--KHLAED MODE -->
-            <Grid Height="1920" Width="1080">
-                <Image Name="khaledModeImage" Stretch="UniformToFill" />
-                <Canvas Name="canvasImage" >
-                    <Image Name="canvasUserImage" Stretch="UniformToFill"/>
-                    <Polyline Name="khaledLineImage" Stroke="Red" StrokeThickness="15">
+            <!--KHLAED MODE IMAGE PAINT  -->
+            <Grid  Height="1080" Width="1920">
+                <Image Name="khaledModeImage"   />
+                <Canvas Name="canvasImage" Margin="-3,0,3,0">
+                    <Image Name="canvasUserImage"  />
+                    <Image Name="backMenu" Source="D:\backMenu.png" Stretch="UniformToFill" Canvas.Top="540" Canvas.Left="724" Width="910" Height="104"/>
+                    <Image Name="pointerHand" Source="D:\pointer.png" Stretch="UniformToFill" Canvas.Left="389" Canvas.Top="61" />
+                    <Image Name="RestartButton" Source="D:\restart.png" Stretch="UniformToFill" Canvas.Left="1359" Canvas.Top="540"/>
+                    <Image Name="ExitButton" Source="D:\exit.png" Stretch="UniformToFill" Canvas.Left="1504" Canvas.Top="540"/>
+                    <Image Name="StrokeButton" Source="D:\stroke.png" Stretch="UniformToFill" Canvas.Left="901" Canvas.Top="540"/>
+                    <Image Name="ColorButton" Source="D:\colors.png" Stretch="UniformToFill" Canvas.Left="751" Canvas.Top="548" RenderTransformOrigin="-0.809,0.529"/>
+                    <Image Name="SaveButton" Source="D:\save.png" Stretch="UniformToFill" Canvas.Left="1051" Canvas.Top="548"/>
+                    <Image Name="EraserButton" Source="D:\eraser.png" Stretch="UniformToFill" Canvas.Left="1213" Canvas.Top="548"/>
+
+                    <Image Name="Stroke4" Source="D:\stroke4.png" Stretch="UniformToFill" Canvas.Left="905" Canvas.Top="105" />
+                    <Image Name="Stroke3" Source="D:\stroke3.png" Stretch="UniformToFill" Canvas.Left="901" Canvas.Top="210" />
+                    <Image Name="Stroke2" Source="D:\stroke2.png" Stretch="UniformToFill" Canvas.Left="905" Canvas.Top="334" />
+                    <Image Name="Stroke1" Source="D:\stroke1.png" Stretch="UniformToFill" RenderTransformOrigin="7.247,1.455" Canvas.Left="901" Canvas.Top="435" />
+                    <Image Name="RedColor" Source="D:\red.png" Stretch="UniformToFill" Canvas.Left="747" Canvas.Top="120" />
+                    <Image Name="BlueColor" Source="D:\blue.png" Stretch="UniformToFill" Canvas.Left="747" Canvas.Top="225" />
+                    <Image Name="BlackColor" Source="D:\black.png" Stretch="UniformToFill" Canvas.Left="747" Canvas.Top="330" />
+                    <Image Name="GreenColor" Source="D:\green.png" Stretch="UniformToFill" Canvas.Left="747" Canvas.Top="435"/>
+
+                    <Image Name="LeftHandPointer" Source="D:\leftHandPointer.png" Stretch="UniformToFill" Canvas.Left="250" Canvas.Top="218"/>
+                    <Polyline Name="khaledLineImage" Stroke="Red" StrokeThickness="10">
                         <Polyline.Effect>
                             <BlurEffect Radius="30" />
                         </Polyline.Effect>
@@ -77,32 +103,10 @@
                 </Canvas>
             </Grid>
         </Viewbox>
-
-
-       
-        <Viewbox Grid.Row="1">  <!--CAMERA ,KHLAED MODE --> 
-            <Grid Width="1920" Height="1080">
-                <Image Name="khaledMode" />
-
-                <Canvas Name="canvas">
-                        <Polyline Name="khaledLine" Stroke="Red" StrokeThickness="15">
-                        <Polyline.Effect>
-                            <BlurEffect Radius="30" />
-                        </Polyline.Effect>
-                    </Polyline>
-                </Canvas>
-            </Grid>
-        </Viewbox>
-
-        <!--<Viewbox Name="wing" Grid.Row="1" HorizontalAlignment="Center">
-            <Image Source="/Images/xwing.png"  Width="50" Height="50" />
-
-        </Viewbox>-->
-
 
 
         <StatusBar Grid.Row="2" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
-      <StatusBarItem Content="{Binding StatusText}" />
-    </StatusBar>
-  </Grid>
+            <StatusBarItem Content="{Binding StatusText}" />
+        </StatusBar>
+    </Grid>
 </Window>

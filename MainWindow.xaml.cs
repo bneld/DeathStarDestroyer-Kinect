@@ -93,10 +93,15 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private IList<Body> k_bodies = null;
         private int kMode = 0;
         private bool photoTaken = false;
-        private String userPhotoPath; 
+        private String userPhotoPath;
+        
+     
 
 
 
+
+
+        // Other 
         private int timeCounter = 0;
         private int timeCounterInSeconds = 0;
         private int maxBalloonsVisible;
@@ -129,7 +134,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private RotateTransform ltrRot;
         private TranslateTransform ltrTns;
         private ScaleTransform ltrScl;
-
+        private Image pointer;
+        private BitmapImage pointerSource; 
 
 
         /// <summary>
@@ -251,9 +257,36 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.k_bitmap = new WriteableBitmap(this.k_width, this.k_height, 96.0, 96.0, PixelFormats.Bgra32, null);
 
             this.k_bodies = new Body[this.kinectSensor.BodyFrameSource.BodyCount];
+            //cameraCounterTextBlock = new TextBlock();
+            //cameracanvas.Children.Add(cameraCounterTextBlock);
 
             khaledMode.Source = this.k_bitmap;
             khaledMode.Visibility = Visibility.Hidden;
+            //Set all Editing menu option to invisible 
+            EraserButton.Visibility = Visibility.Hidden;
+            SaveButton.Visibility = Visibility.Hidden;
+            ColorButton.Visibility = Visibility.Hidden;
+            StrokeButton.Visibility = Visibility.Hidden;
+            backMenu.Visibility = Visibility.Hidden;
+            RestartButton.Visibility = Visibility.Hidden;
+            LeftHandPointer.Visibility = Visibility.Hidden;
+            ExitButton.Visibility = Visibility.Hidden;
+            Stroke1.Visibility = Visibility.Hidden;
+            Stroke2.Visibility = Visibility.Hidden;
+            Stroke3.Visibility = Visibility.Hidden;
+            Stroke4.Visibility = Visibility.Hidden;
+            GreenColor.Visibility = Visibility.Hidden;
+            RedColor.Visibility = Visibility.Hidden;
+            BlackColor.Visibility = Visibility.Hidden;
+            BlueColor.Visibility = Visibility.Hidden;
+
+
+
+
+
+
+
+
 
             //BackgroundPic.IsEnabled = false;
             //BackgroundPic.Visibility = Visibility.Hidden;
@@ -319,7 +352,14 @@ namespace Microsoft.Samples.Kinect.BodyBasics
      
             leftWing.RenderTransform = ltrGrp;
             RightWing.RenderTransform = rtrGrp;
-           
+
+            //Khaled Mode 
+            pointerHand.Visibility = Visibility.Hidden; // The Brush Pointer 
+
+            
+
+
+
             //lSclX.Value = slSclY.Value = 1;
             if (this.bodyFrameReader != null)
             {
@@ -393,15 +433,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
                     
-                    //Random randomNum = new Random();
-                    //for (int i = 0; i < 100; i++)
-                    //{
-                    //    int randomX = rnd.Next(0,displayWidth);
-                    //    int randomY = rnd.Next(0,displayHeight);
-
-                    //    int randomSize = rnd.Next(1,3);
-                    //    dc.DrawEllipse(Brushes.White, )
-                    //}
+                   
 
                         //Draw 
                         if (mode == 0) drawStartMenu(dc);
@@ -437,17 +469,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                             }
                             
                             if(this.mode != 1) this.DrawBody(joints, jointPoints, dc, drawPen);
-                            
-                            //ltrTns.X = jointPoints[JointType.HandLeft].X;
-                            //ltrTns.Y = jointPoints[JointType.HandLeft].Y;
-                            //Draw the xWing along the hand 
-                            //leftWing.Margin = new Thickness(this.Width - jointPoints[JointType.HandLeft].X, jointPoints[JointType.HandLeft].Y,
-                            //             jointPoints[JointType.HandLeft].X, this.Height - jointPoints[JointType.HandLeft].Y);
-                            //RightWing.Margin = new Thickness(this.Width - jointPoints[JointType.HandRight].X, jointPoints[JointType.HandRight].Y,
-                            //       jointPoints[JointType.HandRight].X, this.Height - jointPoints[JointType.HandRight].Y);
-                            //ltrTns.X = jointPoints[JointType.HandLeft].X;
-                            //ltrTns.Y = jointPoints[JointType.HandLeft].Y;
-
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc, true);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc, false);
 
@@ -626,44 +647,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             else prevXWingPointRight = handPosition;
         }
 
-        /*public double calcXWingAngle(Point current, Point prev)
-        {
-            if (current == null || prev == null) return 0;
-
-            double slope = (current.Y - prev.Y) / (current.X - prev.X);
-            double x1 = prev.X;
-            double y1 = prev.Y;
-            double x2 = current.X;
-            double y2 = current.Y;
-
-            if (x2 < x1 && y2 < y1)
-            {
-                return 180 + RadianToDegree(Math.Atan(slope));
-            }
-            else if (x2 < x1 && y2 > y1)
-            {
-                return 180 - RadianToDegree(Math.Atan(slope));
-            }
-            else if (x2 > x1 && y2 > y1)
-            {
-                return RadianToDegree(Math.Atan(slope));
-            }
-            else if (x2 > x1 && y2 < y1)
-            {
-                return -RadianToDegree(Math.Atan(slope));
-            }
-            else if (y1 == y2)
-            {
-                if (x1 < x2) return 0;
-                else return 180;
-            }
-            else if (x1 == x2)
-            {
-                if (y1 < y2) return 90;
-                else return 270;
-            }
-            else return 0;
-        } */
+    
         public double calcXWingAngle(Point current, Point prev)
         {
             if (current == null || prev == null) return 0;
@@ -761,9 +745,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
-        /// <summary>
-        /// Handles the event which the sensor becomes unavailable (E.g. paused, closed, unplugged).
-        /// </summary>
+        
+        // Handles the event which the sensor becomes unavailable (E.g. paused, closed, unplugged).
+       
       
         private void Sensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
         {
@@ -788,7 +772,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 double pX = backgroundBalloons[i].getXLocation();
                 double pY = backgroundBalloons[i].getYLocation();
-               
+
                 if ((distance(handPosition.X, handPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
                 {
                     double size = backgroundBalloons[i].getExplosionRadius();
@@ -797,6 +781,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     backgroundBalloons[i].setDeformLocation(new Point(pX + size*Math.Cos(degreeToRadian(angle)), pY + size * Math.Cos(degreeToRadian(angle))));
                     userScore++;
                 }
+
             }
         }
 
@@ -813,20 +798,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 if (x > playButton.getX() && x < playButton.getX() + playButton.getWidth() && y < playButton.getY() + playButton.getHeight() && y > playButton.getY())
                 {
-                    Console.WriteLine("Button (X): " + playButton.getX() + " |(Y): " + playButton.getY() + " |(X+W): " + (playButton.getY() + playButton.getWidth()) + " |(Y-H): " + (playButton.getY() - playButton.getHeight()));
-                    Console.WriteLine("Hand (X): " + x + " | (Y): " + y);
+                    //Console.WriteLine("Button (X): " + playButton.getX() + " |(Y): " + playButton.getY() + " |(X+W): " + (playButton.getY() + playButton.getWidth()) + " |(Y-H): " + (playButton.getY() - playButton.getHeight()));
+                    //Console.WriteLine("Hand (X): " + x + " | (Y): " + y);
                     return 1; // Game Option 
                 }
                 else if (x > khaledButton.getX() && x < khaledButton.getX() + khaledButton.getWidth() && y < khaledButton.getY() + khaledButton.getHeight() && y > playButton.getY())
                 {
-                    MainMode.Visibility = Visibility.Hidden;
-                    MainMode.IsEnabled = false;
-                    khaledLineImage.Points.Clear();
-                    
-                    khaledMode.Visibility = Visibility.Visible;
-                    khaledMode.IsEnabled = true;
-                    //Console.WriteLine("KHALED MODE");
-                    return 2;
+                   return 2; // Khaled Mode 
                 }
                 else if (x > brianButton.getX() && x < brianButton.getX() + brianButton.getWidth() && y < brianButton.getY() + brianButton.getHeight() && y > brianButton.getY())
                 {
@@ -1077,23 +1055,28 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 leftWing.Visibility = Visibility.Hidden;
                 RightWing.Visibility = Visibility.Hidden;
             }
-            if (this.rightHandLasso == true && this.leftHandLasso == true)
+            if (this.rightHandLasso == true && this.leftHandLasso == true  && this.mode != 2 )
 
             {
                 this.mode = 0;
                 this.khaledMode.Visibility = Visibility.Hidden;
                 this.khaledModeImage.Visibility = Visibility.Hidden;
+                this.canvasImage.Children.Clear();
                 this.khaledLineImage.Points.Clear();   
                 this.MainMode.Visibility = Visibility.Visible;
+
                 this.userLives = 5;
+               
             }
             else if (this.mode == 0)//Main Menu Selection
             {
+                this.kMode = 0;
                 this.mode = checkUserSelection(rightHandPosition.X, rightHandPosition.Y);
                 timeCounter = 0;
                 timeCounterInSeconds = 0;
                 userScore = 0;
                 userLives = 5;
+
             }
             else if (this.mode == 1) // Game Mode 
             {
@@ -1104,35 +1087,51 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 drawCircleGrid(dc);
                 timeKeeper(dc);
                 drawLives(dc);
+
                 if (userLives <= 0)
                     this.mode = 0;
                 
             }
             else if (this.mode == 2)// Khaled Mode 
             {
-                if(this.kMode == 0)
+
+                //General Stuff that must be done 
+                    //Kmode 0 : Take a Picture mode 
+                    //Kmode 1 : Edit Picture Mode 
+              
+                
+                if (this.kMode == 0)
                 {
+                  
+                    this.khaledMode.Visibility = Visibility.Visible;
+                    this.khaledModeImage.Visibility = Visibility.Hidden;
+                    setMenuOptionsVisible(false);
+                    // canvasImage.Children.Clear();
+                    canvasUserImage.Source = null;
+                    khaledMode.Visibility = Visibility.Visible;
+
                     if (this.leftHandClosed = true && this.rightHandLasso == true )
                     {
-                        takeScreenshot(dc );
+                     
+                            takeScreenshot();
+                           // this.kMode = 1; // Go to edit picture mode 
+                        
                     }
                 }
-                else if (this.kMode == 1)
+                if (this.kMode == 1)
                 {
-                    //  dc.DrawImage(this.userPhotoBitmap, new Rect(0, 0 , this.Width,this.Height));
-
-                    Uri imageUri = new Uri(userPhotoPath, UriKind.Relative);
+                    
+                    Uri imageUri = new Uri(userPhotoPath, UriKind.RelativeOrAbsolute);
                     BitmapImage source  = new BitmapImage(new Uri(userPhotoPath, UriKind.RelativeOrAbsolute));
-                 
                     khaledMode.Visibility = Visibility.Hidden;
                     canvasUserImage.Source = source;
                     khaledModeImage.Visibility = Visibility.Visible;
-
-                    //Drawing Menus 
                     
-                    dc.DrawRectangle(Brushes.Blue, new Pen(), new Rect(0, 0, 100, 200));
                 }
             }
+
+
+
 
             else if (this.mode == 3)//Brian's Mode 
             {
@@ -1171,12 +1170,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             timeCounterInSeconds = timeCounter / 30;
         }
 
+
         private void drawSkywalker(DrawingContext drawingContext, double x, double y)
         {
-            //drawingContext.DrawEllipse(b, null, new Point(x, y), 20, 20);
-            //BitmapImage xImage = new BitmapImage(new Uri(@"Images\\spaceship.png", UriKind.Relative));
-            // xImage.Rotation = 
-
+            
             var outPutDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
             var rebelPath = Path.Combine(outPutDirectory, "Images\\rebelLogo.png");
             BitmapImage rebelLogo = new BitmapImage(new Uri(rebelPath, UriKind.RelativeOrAbsolute));
@@ -1235,23 +1232,63 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     if (body != null)
                     {
                         Joint handRight = body.Joints[JointType.HandRight];
+                        Joint handLeft = body.Joints[JointType.HandLeft];
 
                         if (handRight.TrackingState != TrackingState.NotTracked)
                         {
                             CameraSpacePoint handRightPosition = handRight.Position;
                             ColorSpacePoint handRightPoint = this.kinectSensor.CoordinateMapper.MapCameraPointToColorSpace(handRightPosition);
 
+                            CameraSpacePoint handLeftPosition = handLeft.Position;
+                            ColorSpacePoint handLeftPoint = this.kinectSensor.CoordinateMapper.MapCameraPointToColorSpace(handLeftPosition);
+
                             float x = handRightPoint.X;
                             float y = handRightPoint.Y;
 
+                            float lx = handLeftPoint.X;
+                            float ly = handLeftPoint.Y;
+
                             if (!float.IsInfinity(x) && !float.IsInfinity(y))
                             {
-                                if (this.mode ==2 && this.kMode == 1 )
+                                if ( this.kMode == 1  )
                                 {
-                                  //  canvas.Visibility = Visibility.Visible;
-                                    khaledLineImage.Points.Add(new System.Windows.Point { X = x, Y = y });
-                                  
+                                    //Draw !!!
+                                   
+                                    pointerHand.Visibility = Visibility.Visible;
+                                    if (rightHandClosed)
+                                    {
+                                        khaledLineImage.Points.Add(new System.Windows.Point { X = x, Y = y });
+                                    }
+                                    Canvas.SetLeft(pointerHand, x );
+                                    Canvas.SetTop(pointerHand, y );
+
+                                    if (leftHandClosed)
+                                    {
+                                        LeftHandPointer.Visibility = Visibility.Visible;
+                                        setMenuOptionsVisible(true);
+                                        Canvas.SetLeft(LeftHandPointer, lx);
+                                        Canvas.SetTop(LeftHandPointer, ly);
+                                        checkForPaintModeSelection(lx, ly);
+
+                                        if (Stroke1.Visibility == Visibility.Visible)
+                                        {
+                                            checkForStrokeOptions(lx, ly);
+                                        }
+                                        if(GreenColor.Visibility == Visibility.Visible)
+                                        {
+                                            checkForColorOptions(lx, ly);
+                                        }
+                                    }
+                                    if (leftHandClosed == false)
+                                    {
+                                        setMenuOptionsVisible(false);
+                                        LeftHandPointer.Visibility = Visibility.Hidden;
+
+                                    }
+
                                 }
+                                
+
                             }
                         }
                     }
@@ -1259,8 +1296,49 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             }
         }
 
+        private void setMenuOptionsVisible(bool Show)
+        {
+            if (Show)
+            {
+                EraserButton.Visibility = Visibility.Visible;
+                SaveButton.Visibility = Visibility.Visible;
+                ColorButton.Visibility = Visibility.Visible;
+                StrokeButton.Visibility = Visibility.Visible;
+                backMenu.Visibility = Visibility.Visible;
+                RestartButton.Visibility = Visibility.Visible;
+                ExitButton.Visibility = Visibility.Visible;
+                GreenColor.Visibility = Visibility.Visible;
+                RedColor.Visibility = Visibility.Visible;
+                BlackColor.Visibility = Visibility.Visible;
+                BlueColor.Visibility = Visibility.Visible;
+                Stroke1.Visibility = Visibility.Visible;
+                Stroke2.Visibility = Visibility.Visible;
+                Stroke3.Visibility = Visibility.Visible;
+                Stroke4.Visibility = Visibility.Visible;
 
-        private void takeScreenshot(DrawingContext dc )
+            }
+            else
+            {
+                EraserButton.Visibility = Visibility.Hidden;
+                SaveButton.Visibility = Visibility.Hidden;
+                ColorButton.Visibility = Visibility.Hidden;
+                StrokeButton.Visibility = Visibility.Hidden;
+                backMenu.Visibility = Visibility.Hidden;
+                RestartButton.Visibility = Visibility.Hidden;
+                ExitButton.Visibility = Visibility.Hidden;
+                GreenColor.Visibility = Visibility.Hidden;
+                RedColor.Visibility = Visibility.Hidden;
+                BlackColor.Visibility = Visibility.Hidden;
+                BlueColor.Visibility = Visibility.Hidden;
+                Stroke1.Visibility = Visibility.Hidden;
+                Stroke2.Visibility = Visibility.Hidden;
+                Stroke3.Visibility = Visibility.Hidden;
+                Stroke4.Visibility = Visibility.Hidden;
+            }
+        }
+
+
+        private void takeScreenshot()
         {
             if (this.k_bitmap != null)
             {
@@ -1269,50 +1347,206 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 // create frame from the writable bitmap and add to encoder
                 encoder.Frames.Add(BitmapFrame.Create(this.k_bitmap));
+                DateTime dateTime = DateTime.UtcNow.Date;
                 string myPhotos = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-                string path = Path.Combine(myPhotos, "userPhoto.png");
+                string path = Path.Combine(myPhotos, "userPhoto.png"+dateTime.ToString());
+               
 
+                myPhotos = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+                 path = Path.Combine(myPhotos, "userPhoto.png");
                 // write the new file to disk
                 try
-                {
+                    {
+
+                    //Overwriting by deleting an existant older version  
+                   
                     // FileStream is IDisposable
                     using (FileStream fs = new FileStream(path, FileMode.Create))
-                    {
-                        encoder.Save(fs);
-                        //Set the background photo to be the photo that was just saved 
+                        {
 
-
-                        //Image finalImage = new Image();
-                        //  finalImage.Width = this.Width; 
-                        //BitmapImage logo = new BitmapImage();
-                        //logo.BeginInit();
-                        //logo.UriSource = new Uri(path , UriKind.RelativeOrAbsolute);
-                        //logo.EndInit();
-                        //this.kMode = 1; 
-                        //this.khaledMode.Source = null;
-                        userPhotoPath = path;
-                        this.kMode = 1;
-                        
-                        
-
-                     //   BitmapImage imageBitmap = new BitmapImage(imageUri);
-                       
-
-
-
+                            encoder.Save(fs);
+                            userPhotoPath = path;
+                            
+                        kMode = 1;
+                        }
 
                     }
-
-                }
-                catch (IOException)
-                {
-                  //  this.StatusText = string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedScreenshotStatusTextFormat, path);
-                }
+                    catch (IOException)
+                    {
+                        //  this.StatusText = string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedScreenshotStatusTextFormat, path);
+                    }
+            
             }
         }
 
+        private void checkForPaintModeSelection(float x, float y) // Based of Left Hand position 
+        {
+            Console.WriteLine("X :" +x + "Y :" + x);
+            Console.WriteLine("Left: " + Canvas.GetLeft(ColorButton) + "|| TOP: " + Canvas.GetTop(ColorButton));
+            if ( x > Canvas.GetLeft(ColorButton) &&  x < Canvas.GetLeft(ColorButton) + 96 && y > Canvas.GetTop(ColorButton) && y < Canvas.GetTop(ColorButton) + 96)
+            {
+                //Color Button 
+                GreenColor.Visibility = Visibility.Visible;
+                RedColor.Visibility = Visibility.Visible;
+                BlackColor.Visibility = Visibility.Visible;
+                RedColor.Visibility = Visibility.Visible;
+            }
+
+            if (x > Canvas.GetLeft(StrokeButton) && x < Canvas.GetLeft(StrokeButton) + 96 && y > Canvas.GetTop(StrokeButton) && y < Canvas.GetTop(StrokeButton) + 96)
+            {
+
+                Console.WriteLine("Stroke OPTION");
+                Stroke1.Visibility = Visibility.Visible;
+                Stroke2.Visibility = Visibility.Visible;
+                Stroke3.Visibility = Visibility.Visible;
+                Stroke4.Visibility = Visibility.Visible;
+            }
+
+            if (x > Canvas.GetLeft(SaveButton) && x < Canvas.GetLeft(SaveButton) + 96 && y > Canvas.GetTop(SaveButton) && y < Canvas.GetTop(SaveButton) + 96)
+            {
+                Console.WriteLine("Save OPTION");
+                saveImage();
+                takeScreenshot();
+            }
+
+            if (x > Canvas.GetLeft(EraserButton) && x < Canvas.GetLeft(EraserButton) + 96 && y > Canvas.GetTop(EraserButton) && y < Canvas.GetTop(EraserButton) + 96)
+            {
+
+                Console.WriteLine("Eraser  OPTION");
+                khaledLineImage.Points.Clear();
+            }
 
 
+            if (x > Canvas.GetLeft(RestartButton) && x < Canvas.GetLeft(RestartButton) + 96 && y > Canvas.GetTop(RestartButton) && y < Canvas.GetTop(RestartButton) + 96)
+            {
+                khaledLineImage.Points.Clear();
+                //userPhotoPath = "";
+                this.kMode = 0;
+                Console.WriteLine("Restart  OPTION");
+            }
+
+
+
+            if (x > Canvas.GetLeft(ExitButton) && x < Canvas.GetLeft(ExitButton) + 96 && y > Canvas.GetTop(ExitButton) && y < Canvas.GetTop(ExitButton) + 96)
+            {
+                Environment.Exit(0);
+                //  Console.WriteLine("Exit   OPTION");
+            }
+
+        }
+
+        private void checkForStrokeOptions(float x , float y )
+        {
+           if(x > Canvas.GetLeft(Stroke1) && x < Canvas.GetLeft(Stroke1) + 100 && y > Canvas.GetTop(Stroke1) && y < Canvas.GetTop(Stroke1) + 100)
+            {
+                khaledLineImage.StrokeThickness = 7;
+                //Stroke1.Visibility = Visibility.Hidden;
+                //Stroke2.Visibility = Visibility.Hidden;
+                //Stroke3.Visibility = Visibility.Hidden;
+                //Stroke4.Visibility = Visibility.Hidden;
+
+            }
+
+            if (x > Canvas.GetLeft(Stroke2) && x < Canvas.GetLeft(Stroke2) + 100 && y > Canvas.GetTop(Stroke2) && y < Canvas.GetTop(Stroke2) + 100)
+            {
+                khaledLineImage.StrokeThickness = 20;
+                //Stroke1.Visibility = Visibility.Hidden;
+                //Stroke2.Visibility = Visibility.Hidden;
+                //Stroke3.Visibility = Visibility.Hidden;
+                //Stroke4.Visibility = Visibility.Hidden;
+
+            }
+            if (x > Canvas.GetLeft(Stroke3) && x < Canvas.GetLeft(Stroke3) + 100 && y > Canvas.GetTop(Stroke3) && y < Canvas.GetTop(Stroke3) + 100)
+            {
+                khaledLineImage.StrokeThickness = 30;
+                //Stroke1.Visibility = Visibility.Hidden;
+                //Stroke2.Visibility = Visibility.Hidden;
+                //Stroke3.Visibility = Visibility.Hidden;
+                //Stroke4.Visibility = Visibility.Hidden;
+
+            }
+
+            if (x > Canvas.GetLeft(Stroke4) && x < Canvas.GetLeft(Stroke4) + 100 && y > Canvas.GetTop(Stroke4) && y < Canvas.GetTop(Stroke4) + 100)
+            {
+                khaledLineImage.StrokeThickness = 35;
+                //Stroke1.Visibility = Visibility.Hidden;
+                //Stroke2.Visibility = Visibility.Hidden;
+                //Stroke3.Visibility = Visibility.Hidden;
+                //Stroke4.Visibility = Visibility.Hidden;
+
+            }
+        }
+
+        private void checkForColorOptions(float x, float y)
+        {
+            if (x > Canvas.GetLeft(RedColor) && x < Canvas.GetLeft(RedColor) + 100 && y > Canvas.GetTop(RedColor) && y < Canvas.GetTop(RedColor) + 100)
+            {
+                khaledLineImage.Stroke = Brushes.Red;
+                //GreenColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlackColor.Visibility = Visibility.Hidden;
+                //BlueColor.Visibility = Visibility.Hidden;
+
+
+
+            }
+
+            if (x > Canvas.GetLeft(BlackColor) && x < Canvas.GetLeft(BlackColor) + 100 && y > Canvas.GetTop(BlackColor) && y < Canvas.GetTop(BlackColor) + 100)
+            {
+                khaledLineImage.Stroke = Brushes.Black;
+                //GreenColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlackColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlueColor.Visibility = Visibility.Hidden;
+
+
+            }
+            if (x > Canvas.GetLeft(GreenColor) && x < Canvas.GetLeft(GreenColor) + 100 && y > Canvas.GetTop(GreenColor) && y < Canvas.GetTop(GreenColor) + 100)
+            {
+                khaledLineImage.Stroke = Brushes.Green;
+                //GreenColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlackColor.Visibility = Visibility.Hidden;
+                //BlueColor.Visibility = Visibility.Hidden;
+
+
+            }
+
+            if (x > Canvas.GetLeft(BlueColor) && x < Canvas.GetLeft(BlueColor) + 100 && y > Canvas.GetTop(BlueColor) && y < Canvas.GetTop(BlueColor) + 100)
+            {
+                khaledLineImage.Stroke = Brushes.Blue;
+                //GreenColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlackColor.Visibility = Visibility.Hidden;
+                //BlueColor.Visibility = Visibility.Hidden;
+
+
+            }
+        }
+
+        private void saveImage()
+        {
+            var bmpScreenshot = new System.Drawing.Bitmap(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width,
+                               System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height,
+                               System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            // Create a graphics object from the bitmap.
+            var gfxScreenshot = System.Drawing.Graphics.FromImage(bmpScreenshot);
+
+            // Take the screenshot from the upper left corner to the right bottom corner.
+            gfxScreenshot.CopyFromScreen(System.Windows.Forms.SystemInformation.VirtualScreen.X,
+                          System.Windows.Forms.SystemInformation.VirtualScreen.Y,
+                           0,
+                           0,
+                           System.Windows.Forms.SystemInformation.VirtualScreen.Size,
+                           System.Drawing.CopyPixelOperation.SourceCopy);
+
+            DateTime dateTime = DateTime.UtcNow.Date;
+            string myPhotos = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            string path = Path.Combine(myPhotos, "mySavedImage.png"+dateTime.ToString());
+            bmpScreenshot.Save("D:\\Screenshot.png", ImageFormat.Png);
+        }
 
     }
 }
