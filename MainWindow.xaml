@@ -3,33 +3,34 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MAIN GAME" 
         Height="1080" Width="1920" 
-
+        WindowState="Maximized"
         Loaded="MainWindow_Loaded"
-         Closing="MainWindow_Closing"> 
-  <Window.Resources>
-    <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
-    <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
-    <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2" />
-  </Window.Resources>
-  <Grid  Name="mainGrid" Margin="10 0 10 0">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    
+         Closing="MainWindow_Closing">
+    <Window.Resources>
+        <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
+        <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
+        <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2" />
+    </Window.Resources>
+    <Grid  Name="mainGrid" Margin="10 0 10 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+     
+
         <Viewbox Name="MainMode" Grid.Row="1" HorizontalAlignment="Center">
-         
+
 
             <Grid >
-            <Image Source="{Binding ImageSource}" />
-            <Canvas Name="mainModeCanvas" >
+                <Image Source="{Binding ImageSource}" />
+                <Canvas Name="mainModeCanvas" >
 
                     <Rectangle  Grid.Row="1" Stroke="Black"   VerticalAlignment="Stretch"
                          Margin="198,80,260,230" Width="50" Height="50" x:Name="leftWing">
                         <Rectangle.Fill>
 
-                            <ImageBrush ImageSource="C:\lxwing.png" />
+                            <ImageBrush ImageSource="D:\lxwing.png" />
                         </Rectangle.Fill>
                     </Rectangle>
 
@@ -42,7 +43,7 @@
 
                         <Rectangle.Fill>
                             <!--<Image Name="leftWing"  Source="/Images/xwing.png"  Width="50" Height="50"/>-->
-                            <ImageBrush ImageSource="C:\rxwing.png" />
+                            <ImageBrush ImageSource="D:\rxwing.png" />
                         </Rectangle.Fill>
                     </Rectangle>
 
@@ -53,28 +54,38 @@
         </Viewbox>
 
 
-        <!--<Rectangle  Grid.Row="1" Stroke="#FF000000" 
-            VerticalAlignment="Bottom"
-             HorizontalAlignment="Center" 
-             
-            Margin="198,80,260,230" Width="25" Height="25" x:Name="RightWing">
-            
-            <Rectangle.Fill>
-                --><!--<Image Name="leftWing"  Source="/Images/xwing.png"  Width="50" Height="50"/>--><!--
-                <ImageBrush ImageSource="C:\Users\Brian\Documents\lxwing.png" />
-            </Rectangle.Fill>
-        </Rectangle>-->
 
-
-
+        <!-- KHALED MODE -->
+        <Viewbox Grid.Row="1">
+            <!--CAMERA ,KHLAED MODE -->
+            <Grid Width="1920" Height="1080">
+                <Canvas Name="cameracanvas"  >
+                    <Image Name="khaledMode"   />
+                    <Polyline Name="khaledLine" Stroke="Red" StrokeThickness="15">
+                        <Polyline.Effect>
+                            <BlurEffect  Radius="30" />
+                        </Polyline.Effect>
+                    </Polyline>
+                </Canvas>
+            </Grid>
+        </Viewbox>
 
 
         <Viewbox Grid.Row="1">
-            <!--KHLAED MODE -->
-            <Grid Height="1080" Width="1920">
-                <Image Name="khaledModeImage" Stretch="UniformToFill" />
-                <Canvas Name="canvasImage" >
-                    <Image Name="canvasUserImage" Stretch="UniformToFill"/>
+            <!--KHLAED MODE IMAGE PAINT  -->
+            <Grid  Height="1080" Width="1920">
+                <Image Name="khaledModeImage"   />
+                <Canvas Name="canvasImage" Margin="-3,0,3,0">
+                    <Image Name="canvasUserImage"  />
+                    <Image Name="backMenu" Source="D:\backMenu.png" Stretch="UniformToFill" Canvas.Top="540" Canvas.Left="724" Width="760" Height="104"/>
+                    <Image Name="pointerHand" Source="D:\pointer.png" Stretch="UniformToFill" Canvas.Left="389" Canvas.Top="61" />
+                    <Image Name="RestartButton" Source="D:\restart.png" Stretch="UniformToFill" Canvas.Left="1359" Canvas.Top="540"/>
+                    <Image Name="StrokeButton" Source="D:\stroke.png" Stretch="UniformToFill" Canvas.Left="901" Canvas.Top="540"/>
+                    <Image Name="ColorButton" Source="D:\colors.png" Stretch="UniformToFill" Canvas.Left="751" Canvas.Top="548" RenderTransformOrigin="-0.809,0.529"/>
+                    <Image Name="SaveButton" Source="D:\save.png" Stretch="UniformToFill" Canvas.Left="1051" Canvas.Top="548"/>
+                    <Image Name="EraserButton" Source="D:\eraser.png" Stretch="UniformToFill" Canvas.Left="1213" Canvas.Top="548"/>
+                    <Image Name="LeftHandPointer" Source="D:\leftHandPointer.png" Stretch="UniformToFill" Canvas.Left="250" Canvas.Top="218"/>
+
                     <Polyline Name="khaledLineImage" Stroke="Red" StrokeThickness="15">
                         <Polyline.Effect>
                             <BlurEffect Radius="30" />
@@ -85,30 +96,8 @@
         </Viewbox>
 
 
-       
-        <Viewbox Grid.Row="1">  <!--CAMERA ,KHLAED MODE --> 
-            <Grid Width="1920" Height="1080">
-                <Image Name="khaledMode" />
-
-                <Canvas Name="canvas">
-                        <Polyline Name="khaledLine" Stroke="Red" StrokeThickness="15">
-                        <Polyline.Effect>
-                            <BlurEffect Radius="30" />
-                        </Polyline.Effect>
-                    </Polyline>
-                </Canvas>
-            </Grid>
-        </Viewbox>
-
-        <!--<Viewbox Name="wing" Grid.Row="1" HorizontalAlignment="Center">
-            <Image Source="/Images/xwing.png"  Width="50" Height="50" />
-
-        </Viewbox>-->
-
-
-
         <StatusBar Grid.Row="2" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
-      <StatusBarItem Content="{Binding StatusText}" />
-    </StatusBar>
-  </Grid>
+            <StatusBarItem Content="{Binding StatusText}" />
+        </StatusBar>
+    </Grid>
 </Window>
