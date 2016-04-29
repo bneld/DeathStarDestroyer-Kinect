@@ -966,51 +966,63 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             gb.Center = new Point(x, y);
             dr.DrawEllipse(gb, null, new Point(x, y), 30, 30);
 
-            Point p1 = new Point(x + size * Math.Cos(angle - 30), y + size * Math.Sin(angle + 30));
+            Point p1 = new Point(x + size * Math.Cos(degreeToRadian( angle - 30)), y + size * Math.Sin(degreeToRadian(angle - 30)));
+            Point p2 = new Point(x + size * Math.Cos(degreeToRadian(angle + 30)), y + size * Math.Sin(degreeToRadian(angle + 30)));
+            double sl = calcSlope(p1, p2);
+            double intercept = p1.Y - sl * p1.X;
+
           
             for (int angleCount = 0; angleCount < 360; angleCount += 15)
             {
                 if (angle % 15 != 0) Debugger.Break();
 
                 double localSize = size;
-                Point currPoint;
-                if(angleCount == angle)
+                Point currPoint = currPoint = new Point(x + size * explodeXAngles[angleCount / 15]
+                        , y + size * explodeYAngles[angleCount / 15]);
+                if (angleCount == angle)
                 {
                     //currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 + angle))
                     //, deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 + angle)));
-                    currPoint = new Point(x, y);
-                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
+                    //currPoint = new Point(x, y);
+                    Point reflPoint = invertPoint(sl, intercept, currPoint);
+
+                    dr.DrawEllipse(getRandomColorBrush(), null, reflPoint, 3, 3);
                 }
                 else if(angleCount == angle - 15)
                 {
                     //currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 - 15 + angle))
                     //, deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 - 15 + angle)));
-                    currPoint = new Point(x + localSize/2 * Math.Cos(degreeToRadian(angleCount))
-                    , y + localSize/2 * Math.Sin(degreeToRadian(angleCount)));
-                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
+                    //currPoint = new Point(x + localSize/2 * Math.Cos(degreeToRadian(angleCount))
+                    //, y + localSize/2 * Math.Sin(degreeToRadian(angleCount)));
+                    Point reflPoint = invertPoint(sl, intercept, currPoint);
+                    dr.DrawEllipse(getRandomColorBrush(), null, reflPoint, 3, 3);
                 }
                 else if(angleCount == angle - 30)
                 {
-                    currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 - 30 + angle))
-                        , deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 - 30 + angle)));
-                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
+                    //currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 - 30 + angle))
+                    //    , deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 - 30 + angle)));
+                    Point reflPoint = invertPoint(sl, intercept, currPoint);
+                    dr.DrawEllipse(getRandomColorBrush(), null, reflPoint, 3, 3);
                 }
                 else if (angleCount == angle + 15)
                 {
-                    currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 + angle))
-                        , deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 + angle)));
-                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
+                    //currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 + angle))
+                    //  , deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 + angle)));
+                    Point reflPoint = invertPoint(sl, intercept, currPoint);
+
+                    dr.DrawEllipse(getRandomColorBrush(), null, reflPoint, 3, 3);
                 }
                 else if(angleCount == angle + 30)
                 {
-                    currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 + 30 + angle))
-                        , deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 + 30 + angle)));
-                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
+                    //currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 + 30 + angle))
+                    //    , deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 + 30 + angle)));
+                    Point reflPoint = invertPoint(sl, intercept, currPoint);
+                    dr.DrawEllipse(getRandomColorBrush(), null, reflPoint, 3, 3);
                 }
                 else
                 {
-                    currPoint = new Point(x + size * explodeXAngles[angleCount / 15]
-                        , y + size * explodeYAngles[angleCount/15]);
+                    //currPoint = new Point(x + size * explodeXAngles[angleCount / 15]
+                    //    , y + size * explodeYAngles[angleCount/15]);
                     dr.DrawEllipse(getRandomColorBrush(), null, currPoint, 3, 3);
                 }
                 
