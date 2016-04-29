@@ -71,6 +71,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private string statusText = null;
         private Point prevXWingPointLeft;
         private Point prevXWingPointRight;
+        private double xWingAngleLeft;
+        private double xWingAngleRight;
 
         private List<Balloon> balloons;
         private bool bothHandsClosed = false;
@@ -596,8 +598,16 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     }
                     else if (this.mode == 1) //primary game mode
                     {
-                        if (isLeft) drawXWing(drawingContext, handPosition.X, handPosition.Y , calcXWingAngle(handPosition, prevXWingPointLeft), true);
-                        else drawXWing(drawingContext, handPosition.X, handPosition.Y, calcXWingAngle(handPosition, prevXWingPointRight) , false);
+                        if (isLeft)
+                        {
+                            xWingAngleLeft = calcXWingAngle(handPosition, prevXWingPointLeft);
+                            drawXWing(drawingContext, handPosition.X, handPosition.Y, xWingAngleLeft, true);
+                        }
+                        else
+                        {
+                            xWingAngleRight = calcXWingAngle(handPosition, prevXWingPointRight);
+                            drawXWing(drawingContext, handPosition.X, handPosition.Y, xWingAngleRight, false);
+                        }
                         leftWing.Visibility = Visibility.Visible;
                         RightWing.Visibility = Visibility.Visible;
                     }
@@ -705,6 +715,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
             return angle * (180.0 / Math.PI);
         }
+        private double degreeToRadian(double angle)
+        {
+            return angle * (Math.PI / 180.0);
+        }
 
         /// <summary>
         /// Draws indicators to show which edges are clipping body data
@@ -768,28 +782,21 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         //////////////////////GAME METHODS
 
 
-        private void detectHit(Point handPosition)
+        private void detectHit(Point handPosition, double angle)
         {
-            // hand = 0; right hand 
-            // hand = 1 ; left hand
             for(int i = 0; i < backgroundBalloons.Count; i++)
             {
                 double pX = backgroundBalloons[i].getXLocation();
                 double pY = backgroundBalloons[i].getYLocation();
                
-                    if ((distance(handPosition.X, handPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
-                    {
-                        backgroundBalloons[i].setExploded(true);
-                        userScore++;
-                    }
-               
-                
-                    //if ((distance(rightHandPosition.X, rightHandPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
-                    //{
-                    //    backgroundBalloons[i].setExploded(true);
-                    //    userScore++;
-                    //}
-                 
+                if ((distance(handPosition.X, handPosition.Y, pX, pY) <= circleDiameter / 2) && backgroundBalloons[i].getVisible())
+                {
+                    double size = backgroundBalloons[i].getExplosionRadius();
+                    backgroundBalloons[i].setExploded(true);
+                    backgroundBalloons[i].setExplosionAngle(angle);
+                    backgroundBalloons[i].setDeformLocation(new Point(pX + size*Math.Cos(degreeToRadian(angle)), pY + size * Math.Cos(degreeToRadian(angle))));
+                    userScore++;
+                }
             }
         }
 
@@ -960,6 +967,28 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             double x = balloon.getXLocation();
             double y = balloon.getYLocation();
             int size = balloon.getExplosionRadius();
+            double angle = balloon.getExplosionAngle() - 180; //in degrees
+            if (angle < 0) angle += 360;
+
+            //==============TESTING======================
+
+            Point deformPoint = balloon.getDeformLocation();
+            Point p = new Point(x + size * Math.Cos(degreeToRadian(angle)), y + size * Math.Cos(degreeToRadian(angle)));
+            double ellipseX = p.X;
+            double ellipseY = p.Y;
+
+            //ellipse
+            for (int xi = 0; xi <= size; xi+=5)
+            {
+                double height = Math.Pow(size*2, 2);
+                double width = Math.Pow(size, 2);
+
+                //double ycoord = ellipseY + Math.Sqrt(height * (1 - Math.Pow(xi, 2)/width));
+                double ycoord = y + Math.Sqrt(height * (1 - Math.Pow(xi, 2) / width));
+               
+            }
+
+            //==============TESTING======================
 
             Random rand = new Random();
             //RadialGradientBrush gb = new RadialGradientBrush(Colors.Red, Colors.White);
@@ -972,10 +1001,55 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             gb.Opacity = balloon.getExplosionOpacity();
             gb.Center = new Point(x, y);
             dr.DrawEllipse(gb, null, new Point(x, y), 30, 30);
-            for (int j = 0; j < numberOfSidesOnExplosion; j++)
+          
+            for (int angleCount = 0; angleCount < 360; angleCount += 15)
             {
-                dr.DrawEllipse(getRandomColorBrush(), null, new Point(x + size*explodeXAngles[j], y + size*explodeYAngles[j]), 3, 3);
+                Point currPoint;
+                if(angleCount == angle)
+                {
+                    currPoint = new Point(deformPoint.X + size * Math.Cos(degreeToRadian(180 - angle))
+                        , deformPoint.Y + size * Math.Sin(degreeToRadian(180 - angle)));
+                }
+                else if(angleCount >= angle - 30 && angleCount <= angle)
+                {
+                    currPoint = new Point(deformPoint.X + size * Math.Cos(degreeToRadian(180 - angleCount))
+                        , deformPoint.Y + size * Math.Sin(degreeToRadian(180 - angleCount)));
+                }
+                else if (angleCount <= angle + 30 && angleCount >= angle)
+                {
+                    currPoint = new Point(deformPoint.X + size * Math.Cos(degreeToRadian(180 - angleCount))
+                        , deformPoint.Y + size * Math.Sin(degreeToRadian(180 - angleCount)));
+                }
+                else
+                {
+                    currPoint = new Point(x + size * explodeXAngles[angleCount / 15]
+                        , y + size * explodeYAngles[angleCount/15]);
+                }
+                
+                dr.DrawEllipse(getRandomColorBrush(), null, currPoint, 3, 3);
             }
+        }
+        public Point rotatePoint(double cx, double cy, double angle, Point p) //takes radians
+        {
+            double s = Math.Sin(angle);
+            double c = Math.Cos(angle);
+
+            // translate point back to origin:
+            p.X -= cx;
+            p.Y -= cy;
+
+            // rotate point
+            double xnew = p.X * c - p.Y * s;
+            double ynew = p.X * s + p.Y * c;
+
+            // translate point back:
+            p.X = xnew + cx;
+            p.Y = ynew + cy;
+            return p;
+        }
+        public Point findTranslation(Point prev, Point next)
+        {
+            return new Point(prev.X - next.X, prev.Y - next.Y);
         }
         public SolidColorBrush getRandomColorBrush()
         {
@@ -1024,9 +1098,9 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             else if (this.mode == 1) // Game Mode 
             {
                 if(this.leftHandClosed)
-                    detectHit(leftHandPosition);
+                    detectHit(leftHandPosition, xWingAngleLeft);
                 if (this.rightHandClosed)
-                    detectHit(rightHandPosition);
+                    detectHit(rightHandPosition, xWingAngleRight);
                 drawCircleGrid(dc);
                 timeKeeper(dc);
                 drawLives(dc);

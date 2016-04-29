@@ -16,6 +16,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         private Boolean exploded;
         private Boolean visible;
         private int explosionRadius;
+        private double explosionAngle; //in degrees
+        private System.Windows.Point deformLocation; 
 
         private int ticks;
            private double explosionOpacity;
@@ -33,7 +35,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             this.explosionOpacity = 1.0;
 
             this.ticks = ticks;
-
+            explosionAngle = 0;
+            deformLocation = new System.Windows.Point(0, 0);
         }
 
         public double getXLocation()
@@ -129,6 +132,22 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             {
                 explosionOpacity -= 0.25;
             }
+        }
+        public void setExplosionAngle(double angle)
+        {
+            this.explosionAngle = angle;
+        }
+        public double getExplosionAngle()
+        {
+            return explosionAngle;
+        }
+        public void setDeformLocation(System.Windows.Point point)
+        {
+            this.deformLocation = point;
+        }
+        public System.Windows.Point getDeformLocation()
+        {
+            return deformLocation;
         }
     }
 }
