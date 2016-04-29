@@ -77,9 +77,10 @@
                 <Image Name="khaledModeImage"   />
                 <Canvas Name="canvasImage" Margin="-3,0,3,0">
                     <Image Name="canvasUserImage"  />
-                    <Image Name="backMenu" Source="D:\backMenu.png" Stretch="UniformToFill" Canvas.Top="540" Canvas.Left="724" Width="760" Height="104"/>
+                    <Image Name="backMenu" Source="D:\backMenu.png" Stretch="UniformToFill" Canvas.Top="540" Canvas.Left="724" Width="910" Height="104"/>
                     <Image Name="pointerHand" Source="D:\pointer.png" Stretch="UniformToFill" Canvas.Left="389" Canvas.Top="61" />
                     <Image Name="RestartButton" Source="D:\restart.png" Stretch="UniformToFill" Canvas.Left="1359" Canvas.Top="540"/>
+                    <Image Name="ExitButton" Source="D:\exit.png" Stretch="UniformToFill" Canvas.Left="1504" Canvas.Top="540"/>
                     <Image Name="StrokeButton" Source="D:\stroke.png" Stretch="UniformToFill" Canvas.Left="901" Canvas.Top="540"/>
                     <Image Name="ColorButton" Source="D:\colors.png" Stretch="UniformToFill" Canvas.Left="751" Canvas.Top="548" RenderTransformOrigin="-0.809,0.529"/>
                     <Image Name="SaveButton" Source="D:\save.png" Stretch="UniformToFill" Canvas.Left="1051" Canvas.Top="548"/>

@@ -268,6 +268,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             backMenu.Visibility = Visibility.Hidden;
             RestartButton.Visibility = Visibility.Hidden;
             LeftHandPointer.Visibility = Visibility.Hidden;
+            ExitButton.Visibility = Visibility.Hidden;
+
 
 
 
@@ -960,25 +962,22 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 leftWing.Visibility = Visibility.Hidden;
                 RightWing.Visibility = Visibility.Hidden;
             }
-            if (this.rightHandLasso == true && this.leftHandLasso == true )
+            if (this.rightHandLasso == true && this.leftHandLasso == true  && this.mode != 2 )
 
             {
                 this.mode = 0;
                 this.khaledMode.Visibility = Visibility.Hidden;
                 this.khaledModeImage.Visibility = Visibility.Hidden;
-                //this.khaledLineImage.Points.Clear();   
+                this.canvasImage.Children.Clear();
+                this.khaledLineImage.Points.Clear();   
                 this.MainMode.Visibility = Visibility.Visible;
+
                 this.userLives = 5;
-                if(kMode ==1)
-                {
-                    khaledModeImage.Visibility = Visibility.Hidden;
-                    canvasImage.Visibility = Visibility.Hidden;
-                    khaledLineImage.Points.Clear();
-                    MainMode.Visibility = Visibility.Visible;
-                 }
+               
             }
             else if (this.mode == 0)//Main Menu Selection
             {
+                this.kMode = 0;
                 this.mode = checkUserSelection(rightHandPosition.X, rightHandPosition.Y);
                 timeCounter = 0;
                 timeCounterInSeconds = 0;
@@ -1005,31 +1004,29 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 //General Stuff that must be done 
                     //Kmode 0 : Take a Picture mode 
                     //Kmode 1 : Edit Picture Mode 
-               // this.kMode = 0;
-                this.MainMode.Visibility = Visibility.Hidden;
-                this.MainMode.IsEnabled = false;
-               // this.khaledLineImage.Points.Clear();
-                this.khaledMode.Visibility = Visibility.Visible;
-                this.khaledMode.IsEnabled = true;
+              
+                
                 if (this.kMode == 0)
                 {
+                  
+                    this.khaledMode.Visibility = Visibility.Visible;
+                    this.khaledModeImage.Visibility = Visibility.Hidden;
+                    setMenuOptionsVisible(false);
+                    // canvasImage.Children.Clear();
+                    canvasUserImage.Source = null;
+                    khaledMode.Visibility = Visibility.Visible;
+
                     if (this.leftHandClosed = true && this.rightHandLasso == true )
                     {
-                      //  CameraTimer(dc);
-                      //  if (cameraCounterInSeconds == 3)
-                        
+                     
                             takeScreenshot();
-                        //cameraCouner = 0;
-                        //cameraCounterInSeconds = 0;
-                     //   pointerHand.Visibility = Visibility.Visible; 
-                        this.kMode = 1; // Go to edit picture mode 
+                            this.kMode = 1; // Go to edit picture mode 
                         
                     }
                 }
                 if (this.kMode == 1)
                 {
-                    //  dc.DrawImage(this.userPhotoBitmap, new Rect(0, 0 , this.Width,this.Height));
-
+                    
                     Uri imageUri = new Uri(userPhotoPath, UriKind.RelativeOrAbsolute);
                     BitmapImage source  = new BitmapImage(new Uri(userPhotoPath, UriKind.RelativeOrAbsolute));
                     khaledMode.Visibility = Visibility.Hidden;
@@ -1079,20 +1076,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             timeCounterInSeconds = timeCounter / 30;
         }
 
-        //Camera Timer method 
-        //private void CameraTimer(DrawingContext drawingContext)
-        //{
-        //    String time = Convert.ToString(timeCounterInSeconds);
-        //    FormattedText timeText = new FormattedText(time, CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, 
-        //            new Typeface("Verdana"), 32 , Brushes.Red);
-        //    cameraCounterTextBlock.Text = time;
-        //    // drawingContext.DrawText(timeText, new Point((displayWidth / 2) - (timeText.WidthIncludingTrailingWhitespace / 2), 10));
-        //    Canvas.SetLeft(cameraCounterTextBlock, 50);
-        //    Canvas.SetTop(cameraCounterTextBlock, 50);
-
-        //    cameraCouner++;
-        //    cameraCounterInSeconds = cameraCouner / 30;
-        //}
 
         private void drawSkywalker(DrawingContext drawingContext, double x, double y)
         {
@@ -1189,8 +1172,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                         setMenuOptionsVisible(true);
                                         Canvas.SetLeft(LeftHandPointer, lx);
                                         Canvas.SetTop(LeftHandPointer, ly);
-                                        checkForPaintModeSelection(x, y);
-                                        Console.WriteLine("X :" + lx + "Y :" + ly);
+                                        checkForPaintModeSelection(lx, ly);
+                                        
                                     }
                                     if (leftHandClosed == false)
                                     {
@@ -1218,6 +1201,8 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 StrokeButton.Visibility = Visibility.Visible;
                 backMenu.Visibility = Visibility.Visible;
                 RestartButton.Visibility = Visibility.Visible;
+                ExitButton.Visibility = Visibility.Visible;
+
             }
             else
             {
@@ -1227,7 +1212,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 StrokeButton.Visibility = Visibility.Hidden;
                 backMenu.Visibility = Visibility.Hidden;
                 RestartButton.Visibility = Visibility.Hidden;
-
+                ExitButton.Visibility = Visibility.Hidden;
             }
         }
 
@@ -1265,13 +1250,49 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         private void checkForPaintModeSelection(float x, float y) // Based of Left Hand position 
         {
-
-
-            if (x == 751 && y == 584)
+            Console.WriteLine("X :" +x + "Y :" + x);
+            Console.WriteLine("Left: " + Canvas.GetLeft(ColorButton) + "|| TOP: " + Canvas.GetTop(ColorButton));
+            if ( x > Canvas.GetLeft(ColorButton) &&  x < Canvas.GetLeft(ColorButton) + 96 && y > Canvas.GetTop(ColorButton) && y < Canvas.GetTop(ColorButton) + 96)
             {
 
-                Console.WriteLine("MENU OPTION");
+                Console.WriteLine("COLORS OPTION");
             }
+
+            if (x > Canvas.GetLeft(StrokeButton) && x < Canvas.GetLeft(StrokeButton) + 96 && y > Canvas.GetTop(StrokeButton) && y < Canvas.GetTop(StrokeButton) + 96)
+            {
+
+                Console.WriteLine("Stroke OPTION");
+            }
+
+            if (x > Canvas.GetLeft(SaveButton) && x < Canvas.GetLeft(SaveButton) + 96 && y > Canvas.GetTop(SaveButton) && y < Canvas.GetTop(SaveButton) + 96)
+            {
+                Console.WriteLine("Save OPTION");
+                //takeScreenshot();
+            }
+
+            if (x > Canvas.GetLeft(EraserButton) && x < Canvas.GetLeft(EraserButton) + 96 && y > Canvas.GetTop(EraserButton) && y < Canvas.GetTop(EraserButton) + 96)
+            {
+
+                Console.WriteLine("Eraser  OPTION");
+                khaledLineImage.Points.Clear();
+            }
+
+
+            if (x > Canvas.GetLeft(RestartButton) && x < Canvas.GetLeft(RestartButton) + 96 && y > Canvas.GetTop(RestartButton) && y < Canvas.GetTop(RestartButton) + 96)
+            {
+                khaledLineImage.Points.Clear();
+                this.kMode = 0;
+                Console.WriteLine("Restart  OPTION");
+            }
+
+
+
+            if (x > Canvas.GetLeft(ExitButton) && x < Canvas.GetLeft(ExitButton) + 96 && y > Canvas.GetTop(ExitButton) && y < Canvas.GetTop(ExitButton) + 96)
+            {
+                Environment.Exit(0);
+                //  Console.WriteLine("Exit   OPTION");
+            }
+
         }
 
 
