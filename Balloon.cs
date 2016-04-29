@@ -135,6 +135,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         }
         public void setExplosionAngle(double angle)
         {
+            if (angle >= 360) angle -= 360;
             this.explosionAngle = angle;
         }
         public double getExplosionAngle()

@@ -281,13 +281,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             BlueColor.Visibility = Visibility.Hidden;
 
 
-
-
-
-
-
-
-
             //BackgroundPic.IsEnabled = false;
             //BackgroundPic.Visibility = Visibility.Hidden;
 
@@ -646,7 +639,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             if (isLeft) prevXWingPointLeft = handPosition;
             else prevXWingPointRight = handPosition;
         }
-
+        public double calcSlope(Point p1, Point p2)
+        {
+            if (p1 == null || p2 == null) return 0;
+            if (p1.X - p2.X == 0) return 100;
+            double slope = (p1.Y - p2.Y) / (p1.X - p2.X);
+            return slope;
+        }
     
         public double calcXWingAngle(Point current, Point prev)
         {
@@ -777,8 +776,11 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 {
                     double size = backgroundBalloons[i].getExplosionRadius();
                     backgroundBalloons[i].setExploded(true);
-                    backgroundBalloons[i].setExplosionAngle(angle);
-                    backgroundBalloons[i].setDeformLocation(new Point(pX + size*Math.Cos(degreeToRadian(angle)), pY + size * Math.Cos(degreeToRadian(angle))));
+                    double adjustAngle = 180 + angle;
+                    Console.WriteLine("aj "  + adjustAngle);
+                    //Debugger.Break();
+                    backgroundBalloons[i].setExplosionAngle(adjustAngle);
+                    backgroundBalloons[i].setDeformLocation(new Point(pX + size*Math.Cos(degreeToRadian(adjustAngle)), pY + size*Math.Cos(degreeToRadian(adjustAngle))));
                     userScore++;
                 }
 
@@ -945,28 +947,12 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             double x = balloon.getXLocation();
             double y = balloon.getYLocation();
             int size = balloon.getExplosionRadius();
-            double angle = balloon.getExplosionAngle() - 180; //in degrees
-            if (angle < 0) angle += 360;
+            double angle = balloon.getExplosionAngle(); //in degrees
+            Console.WriteLine(angle);
+            //Debugger.Break();
 
-            //==============TESTING======================
-
-            Point deformPoint = balloon.getDeformLocation();
-            Point p = new Point(x + size * Math.Cos(degreeToRadian(angle)), y + size * Math.Cos(degreeToRadian(angle)));
-            double ellipseX = p.X;
-            double ellipseY = p.Y;
-
-            //ellipse
-            for (int xi = 0; xi <= size; xi+=5)
-            {
-                double height = Math.Pow(size*2, 2);
-                double width = Math.Pow(size, 2);
-
-                //double ycoord = ellipseY + Math.Sqrt(height * (1 - Math.Pow(xi, 2)/width));
-                double ycoord = y + Math.Sqrt(height * (1 - Math.Pow(xi, 2) / width));
-               
-            }
-
-            //==============TESTING======================
+            //Point deformPoint = balloon.getDeformLocation();
+            Point deformPoint = new Point(x + size * Math.Cos(degreeToRadian(angle)), y + size * Math.Cos(degreeToRadian(angle)));
 
             Random rand = new Random();
             //RadialGradientBrush gb = new RadialGradientBrush(Colors.Red, Colors.White);
@@ -979,33 +965,68 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             gb.Opacity = balloon.getExplosionOpacity();
             gb.Center = new Point(x, y);
             dr.DrawEllipse(gb, null, new Point(x, y), 30, 30);
+
+            Point p1 = new Point(x + size * Math.Cos(angle - 30), y + size * Math.Sin(angle + 30));
           
             for (int angleCount = 0; angleCount < 360; angleCount += 15)
             {
+                if (angle % 15 != 0) Debugger.Break();
+
+                double localSize = size;
                 Point currPoint;
                 if(angleCount == angle)
                 {
-                    currPoint = new Point(deformPoint.X + size * Math.Cos(degreeToRadian(180 - angle))
-                        , deformPoint.Y + size * Math.Sin(degreeToRadian(180 - angle)));
+                    //currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 + angle))
+                    //, deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 + angle)));
+                    currPoint = new Point(x, y);
+                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
                 }
-                else if(angleCount >= angle - 30 && angleCount <= angle)
+                else if(angleCount == angle - 15)
                 {
-                    currPoint = new Point(deformPoint.X + size * Math.Cos(degreeToRadian(180 - angleCount))
-                        , deformPoint.Y + size * Math.Sin(degreeToRadian(180 - angleCount)));
+                    //currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 - 15 + angle))
+                    //, deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 - 15 + angle)));
+                    currPoint = new Point(x + localSize/2 * Math.Cos(degreeToRadian(angleCount))
+                    , y + localSize/2 * Math.Sin(degreeToRadian(angleCount)));
+                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
                 }
-                else if (angleCount <= angle + 30 && angleCount >= angle)
+                else if(angleCount == angle - 30)
                 {
-                    currPoint = new Point(deformPoint.X + size * Math.Cos(degreeToRadian(180 - angleCount))
-                        , deformPoint.Y + size * Math.Sin(degreeToRadian(180 - angleCount)));
+                    currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 - 30 + angle))
+                        , deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 - 30 + angle)));
+                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
+                }
+                else if (angleCount == angle + 15)
+                {
+                    currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 + angle))
+                        , deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 + angle)));
+                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
+                }
+                else if(angleCount == angle + 30)
+                {
+                    currPoint = new Point(deformPoint.X + localSize * Math.Cos(degreeToRadian(180 + 30 + angle))
+                        , deformPoint.Y + localSize * Math.Sin(degreeToRadian(180 + 30 + angle)));
+                    dr.DrawEllipse(Brushes.Red, null, currPoint, 3, 3);
                 }
                 else
                 {
                     currPoint = new Point(x + size * explodeXAngles[angleCount / 15]
                         , y + size * explodeYAngles[angleCount/15]);
+                    dr.DrawEllipse(getRandomColorBrush(), null, currPoint, 3, 3);
                 }
                 
-                dr.DrawEllipse(getRandomColorBrush(), null, currPoint, 3, 3);
+                //dr.DrawEllipse(getRandomColorBrush(), null, currPoint, 3, 3);
             }
+        }
+        public Point invertPoint(double lineSlope, double lineInter, Point p)
+        {
+            double x = p.X;
+            double y = p.Y;
+            double c = lineInter;
+            double a = lineSlope;
+            double d = (x + (y - c) * a) / (1 + Math.Pow(a, 2));
+            double x2 = 2*d - x;
+            double y2 = 2*d*a - y + 2*c;
+            return new Point(x2, y2);
         }
         public Point rotatePoint(double cx, double cy, double angle, Point p) //takes radians
         {
