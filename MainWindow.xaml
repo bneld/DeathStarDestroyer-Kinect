@@ -85,12 +85,15 @@
                     <Image Name="ColorButton" Source="D:\colors.png" Stretch="UniformToFill" Canvas.Left="751" Canvas.Top="548" RenderTransformOrigin="-0.809,0.529"/>
                     <Image Name="SaveButton" Source="D:\save.png" Stretch="UniformToFill" Canvas.Left="1051" Canvas.Top="548"/>
                     <Image Name="EraserButton" Source="D:\eraser.png" Stretch="UniformToFill" Canvas.Left="1213" Canvas.Top="548"/>
-                    <StackPanel Name="StokeStackPanel" Canvas.Left="901" Canvas.Top="135">
-                        <Image Name="Stroke4" Source="D:\stroke4.png" Stretch="UniformToFill" />
-                        <Image Name="Stroke3" Source="D:\stroke3.png" Stretch="UniformToFill" />
-                        <Image Name="Stroke2" Source="D:\stroke2.png" Stretch="UniformToFill" />
-                        <Image Name="Stroke1" Source="D:\stroke1.png" Stretch="UniformToFill" />
-                    </StackPanel>
+
+                    <Image Name="Stroke4" Source="D:\stroke4.png" Stretch="UniformToFill" Canvas.Left="905" Canvas.Top="105" />
+                    <Image Name="Stroke3" Source="D:\stroke3.png" Stretch="UniformToFill" Canvas.Left="901" Canvas.Top="210" />
+                    <Image Name="Stroke2" Source="D:\stroke2.png" Stretch="UniformToFill" Canvas.Left="905" Canvas.Top="334" />
+                    <Image Name="Stroke1" Source="D:\stroke1.png" Stretch="UniformToFill" RenderTransformOrigin="7.247,1.455" Canvas.Left="901" Canvas.Top="435" />
+                    <Image Name="RedColor" Source="D:\red.png" Stretch="UniformToFill" Canvas.Left="747" Canvas.Top="120" />
+                    <Image Name="BlueColor" Source="D:\blue.png" Stretch="UniformToFill" Canvas.Left="747" Canvas.Top="225" />
+                    <Image Name="BlackColor" Source="D:\black.png" Stretch="UniformToFill" Canvas.Left="747" Canvas.Top="330" />
+                    <Image Name="GreenColor" Source="D:\green.png" Stretch="UniformToFill" Canvas.Left="747" Canvas.Top="435"/>
 
                     <Image Name="LeftHandPointer" Source="D:\leftHandPointer.png" Stretch="UniformToFill" Canvas.Left="250" Canvas.Top="218"/>
                     <Polyline Name="khaledLineImage" Stroke="Red" StrokeThickness="10">

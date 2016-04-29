@@ -269,7 +269,17 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             RestartButton.Visibility = Visibility.Hidden;
             LeftHandPointer.Visibility = Visibility.Hidden;
             ExitButton.Visibility = Visibility.Hidden;
-            StokeStackPanel.Visibility = Visibility.Hidden;
+            Stroke1.Visibility = Visibility.Hidden;
+            Stroke2.Visibility = Visibility.Hidden;
+            Stroke3.Visibility = Visibility.Hidden;
+            Stroke4.Visibility = Visibility.Hidden;
+            GreenColor.Visibility = Visibility.Hidden;
+            RedColor.Visibility = Visibility.Hidden;
+            BlackColor.Visibility = Visibility.Hidden;
+            BlueColor.Visibility = Visibility.Hidden;
+
+
+
 
 
 
@@ -1177,9 +1187,13 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                         Canvas.SetTop(LeftHandPointer, ly);
                                         checkForPaintModeSelection(lx, ly);
 
-                                        if (StokeStackPanel.Visibility == Visibility.Visible)
+                                        if (Stroke1.Visibility == Visibility.Visible)
                                         {
                                             checkForStrokeOptions(lx, ly);
+                                        }
+                                        if(GreenColor.Visibility == Visibility.Visible)
+                                        {
+                                            checkForColorOptions(lx, ly);
                                         }
                                     }
                                     if (leftHandClosed == false)
@@ -1210,6 +1224,14 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 backMenu.Visibility = Visibility.Visible;
                 RestartButton.Visibility = Visibility.Visible;
                 ExitButton.Visibility = Visibility.Visible;
+                GreenColor.Visibility = Visibility.Visible;
+                RedColor.Visibility = Visibility.Visible;
+                BlackColor.Visibility = Visibility.Visible;
+                BlueColor.Visibility = Visibility.Visible;
+                Stroke1.Visibility = Visibility.Visible;
+                Stroke2.Visibility = Visibility.Visible;
+                Stroke3.Visibility = Visibility.Visible;
+                Stroke4.Visibility = Visibility.Visible;
 
             }
             else
@@ -1221,6 +1243,14 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 backMenu.Visibility = Visibility.Hidden;
                 RestartButton.Visibility = Visibility.Hidden;
                 ExitButton.Visibility = Visibility.Hidden;
+                GreenColor.Visibility = Visibility.Hidden;
+                RedColor.Visibility = Visibility.Hidden;
+                BlackColor.Visibility = Visibility.Hidden;
+                BlueColor.Visibility = Visibility.Hidden;
+                Stroke1.Visibility = Visibility.Hidden;
+                Stroke2.Visibility = Visibility.Hidden;
+                Stroke3.Visibility = Visibility.Hidden;
+                Stroke4.Visibility = Visibility.Hidden;
             }
         }
 
@@ -1272,15 +1302,21 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             Console.WriteLine("Left: " + Canvas.GetLeft(ColorButton) + "|| TOP: " + Canvas.GetTop(ColorButton));
             if ( x > Canvas.GetLeft(ColorButton) &&  x < Canvas.GetLeft(ColorButton) + 96 && y > Canvas.GetTop(ColorButton) && y < Canvas.GetTop(ColorButton) + 96)
             {
-
-               
+                //Color Button 
+                GreenColor.Visibility = Visibility.Visible;
+                RedColor.Visibility = Visibility.Visible;
+                BlackColor.Visibility = Visibility.Visible;
+                RedColor.Visibility = Visibility.Visible;
             }
 
             if (x > Canvas.GetLeft(StrokeButton) && x < Canvas.GetLeft(StrokeButton) + 96 && y > Canvas.GetTop(StrokeButton) && y < Canvas.GetTop(StrokeButton) + 96)
             {
 
                 Console.WriteLine("Stroke OPTION");
-                StokeStackPanel.Visibility = Visibility.Visible;
+                Stroke1.Visibility = Visibility.Visible;
+                Stroke2.Visibility = Visibility.Visible;
+                Stroke3.Visibility = Visibility.Visible;
+                Stroke4.Visibility = Visibility.Visible;
             }
 
             if (x > Canvas.GetLeft(SaveButton) && x < Canvas.GetLeft(SaveButton) + 96 && y > Canvas.GetTop(SaveButton) && y < Canvas.GetTop(SaveButton) + 96)
@@ -1320,27 +1356,88 @@ namespace Microsoft.Samples.Kinect.BodyBasics
         {
            if(x > Canvas.GetLeft(Stroke1) && x < Canvas.GetLeft(Stroke1) + 100 && y > Canvas.GetTop(Stroke1) && y < Canvas.GetTop(Stroke1) + 100)
             {
-                khaledLineImage.StrokeThickness = 5;
-                StokeStackPanel.Visibility = Visibility.Hidden;
-             }
+                khaledLineImage.StrokeThickness = 7;
+                //Stroke1.Visibility = Visibility.Hidden;
+                //Stroke2.Visibility = Visibility.Hidden;
+                //Stroke3.Visibility = Visibility.Hidden;
+                //Stroke4.Visibility = Visibility.Hidden;
+
+            }
 
             if (x > Canvas.GetLeft(Stroke2) && x < Canvas.GetLeft(Stroke2) + 100 && y > Canvas.GetTop(Stroke2) && y < Canvas.GetTop(Stroke2) + 100)
             {
-                khaledLineImage.StrokeThickness = 10;
-                StokeStackPanel.Visibility = Visibility.Hidden;
+                khaledLineImage.StrokeThickness = 20;
+                //Stroke1.Visibility = Visibility.Hidden;
+                //Stroke2.Visibility = Visibility.Hidden;
+                //Stroke3.Visibility = Visibility.Hidden;
+                //Stroke4.Visibility = Visibility.Hidden;
 
             }
             if (x > Canvas.GetLeft(Stroke3) && x < Canvas.GetLeft(Stroke3) + 100 && y > Canvas.GetTop(Stroke3) && y < Canvas.GetTop(Stroke3) + 100)
             {
-                khaledLineImage.StrokeThickness = 15;
-                StokeStackPanel.Visibility = Visibility.Hidden;
+                khaledLineImage.StrokeThickness = 30;
+                //Stroke1.Visibility = Visibility.Hidden;
+                //Stroke2.Visibility = Visibility.Hidden;
+                //Stroke3.Visibility = Visibility.Hidden;
+                //Stroke4.Visibility = Visibility.Hidden;
 
             }
 
             if (x > Canvas.GetLeft(Stroke4) && x < Canvas.GetLeft(Stroke4) + 100 && y > Canvas.GetTop(Stroke4) && y < Canvas.GetTop(Stroke4) + 100)
             {
-                khaledLineImage.StrokeThickness = 20;
-                StokeStackPanel.Visibility = Visibility.Hidden;
+                khaledLineImage.StrokeThickness = 35;
+                //Stroke1.Visibility = Visibility.Hidden;
+                //Stroke2.Visibility = Visibility.Hidden;
+                //Stroke3.Visibility = Visibility.Hidden;
+                //Stroke4.Visibility = Visibility.Hidden;
+
+            }
+        }
+
+        private void checkForColorOptions(float x, float y)
+        {
+            if (x > Canvas.GetLeft(RedColor) && x < Canvas.GetLeft(RedColor) + 100 && y > Canvas.GetTop(RedColor) && y < Canvas.GetTop(RedColor) + 100)
+            {
+                khaledLineImage.Stroke = Brushes.Red;
+                //GreenColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlackColor.Visibility = Visibility.Hidden;
+                //BlueColor.Visibility = Visibility.Hidden;
+
+
+
+            }
+
+            if (x > Canvas.GetLeft(BlackColor) && x < Canvas.GetLeft(BlackColor) + 100 && y > Canvas.GetTop(BlackColor) && y < Canvas.GetTop(BlackColor) + 100)
+            {
+                khaledLineImage.Stroke = Brushes.Black;
+                //GreenColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlackColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlueColor.Visibility = Visibility.Hidden;
+
+
+            }
+            if (x > Canvas.GetLeft(GreenColor) && x < Canvas.GetLeft(GreenColor) + 100 && y > Canvas.GetTop(GreenColor) && y < Canvas.GetTop(GreenColor) + 100)
+            {
+                khaledLineImage.Stroke = Brushes.Green;
+                //GreenColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlackColor.Visibility = Visibility.Hidden;
+                //BlueColor.Visibility = Visibility.Hidden;
+
+
+            }
+
+            if (x > Canvas.GetLeft(BlueColor) && x < Canvas.GetLeft(BlueColor) + 100 && y > Canvas.GetTop(BlueColor) && y < Canvas.GetTop(BlueColor) + 100)
+            {
+                khaledLineImage.Stroke = Brushes.Blue;
+                //GreenColor.Visibility = Visibility.Hidden;
+                //RedColor.Visibility = Visibility.Hidden;
+                //BlackColor.Visibility = Visibility.Hidden;
+                //BlueColor.Visibility = Visibility.Hidden;
+
 
             }
         }
