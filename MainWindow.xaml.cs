@@ -269,6 +269,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             RestartButton.Visibility = Visibility.Hidden;
             LeftHandPointer.Visibility = Visibility.Hidden;
             ExitButton.Visibility = Visibility.Hidden;
+            StokeStackPanel.Visibility = Visibility.Hidden;
 
 
 
@@ -1020,7 +1021,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                     {
                      
                             takeScreenshot();
-                            this.kMode = 1; // Go to edit picture mode 
+                           // this.kMode = 1; // Go to edit picture mode 
                         
                     }
                 }
@@ -1161,8 +1162,10 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                     //Draw !!!
                                    
                                     pointerHand.Visibility = Visibility.Visible;
-                                    if(rightHandClosed)  khaledLineImage.Points.Add(new System.Windows.Point { X = x, Y = y  });
-
+                                    if (rightHandClosed)
+                                    {
+                                        khaledLineImage.Points.Add(new System.Windows.Point { X = x, Y = y });
+                                    }
                                     Canvas.SetLeft(pointerHand, x );
                                     Canvas.SetTop(pointerHand, y );
 
@@ -1173,12 +1176,17 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                                         Canvas.SetLeft(LeftHandPointer, lx);
                                         Canvas.SetTop(LeftHandPointer, ly);
                                         checkForPaintModeSelection(lx, ly);
-                                        
+
+                                        if (StokeStackPanel.Visibility == Visibility.Visible)
+                                        {
+                                            checkForStrokeOptions(lx, ly);
+                                        }
                                     }
                                     if (leftHandClosed == false)
                                     {
                                         setMenuOptionsVisible(false);
                                         LeftHandPointer.Visibility = Visibility.Hidden;
+
                                     }
 
                                 }
@@ -1226,25 +1234,35 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 // create frame from the writable bitmap and add to encoder
                 encoder.Frames.Add(BitmapFrame.Create(this.k_bitmap));
+                DateTime dateTime = DateTime.UtcNow.Date;
                 string myPhotos = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-                string path = Path.Combine(myPhotos, "userPhoto.png");
+                string path = Path.Combine(myPhotos, "userPhoto.png"+dateTime.ToString());
+               
 
+                myPhotos = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+                 path = Path.Combine(myPhotos, "userPhoto.png");
                 // write the new file to disk
                 try
-                {
+                    {
+
+                    //Overwriting by deleting an existant older version  
+                   
                     // FileStream is IDisposable
                     using (FileStream fs = new FileStream(path, FileMode.Create))
-                    {
-                        encoder.Save(fs);
-                        userPhotoPath = path;
-                  
-                    }
+                        {
 
-                }
-                catch (IOException)
-                {
-                  //  this.StatusText = string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedScreenshotStatusTextFormat, path);
-                }
+                            encoder.Save(fs);
+                            userPhotoPath = path;
+                            
+                        kMode = 1;
+                        }
+
+                    }
+                    catch (IOException)
+                    {
+                        //  this.StatusText = string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedScreenshotStatusTextFormat, path);
+                    }
+            
             }
         }
 
@@ -1255,19 +1273,21 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             if ( x > Canvas.GetLeft(ColorButton) &&  x < Canvas.GetLeft(ColorButton) + 96 && y > Canvas.GetTop(ColorButton) && y < Canvas.GetTop(ColorButton) + 96)
             {
 
-                Console.WriteLine("COLORS OPTION");
+               
             }
 
             if (x > Canvas.GetLeft(StrokeButton) && x < Canvas.GetLeft(StrokeButton) + 96 && y > Canvas.GetTop(StrokeButton) && y < Canvas.GetTop(StrokeButton) + 96)
             {
 
                 Console.WriteLine("Stroke OPTION");
+                StokeStackPanel.Visibility = Visibility.Visible;
             }
 
             if (x > Canvas.GetLeft(SaveButton) && x < Canvas.GetLeft(SaveButton) + 96 && y > Canvas.GetTop(SaveButton) && y < Canvas.GetTop(SaveButton) + 96)
             {
                 Console.WriteLine("Save OPTION");
-                //takeScreenshot();
+                saveImage();
+                takeScreenshot();
             }
 
             if (x > Canvas.GetLeft(EraserButton) && x < Canvas.GetLeft(EraserButton) + 96 && y > Canvas.GetTop(EraserButton) && y < Canvas.GetTop(EraserButton) + 96)
@@ -1281,6 +1301,7 @@ namespace Microsoft.Samples.Kinect.BodyBasics
             if (x > Canvas.GetLeft(RestartButton) && x < Canvas.GetLeft(RestartButton) + 96 && y > Canvas.GetTop(RestartButton) && y < Canvas.GetTop(RestartButton) + 96)
             {
                 khaledLineImage.Points.Clear();
+                //userPhotoPath = "";
                 this.kMode = 0;
                 Console.WriteLine("Restart  OPTION");
             }
@@ -1295,6 +1316,57 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
         }
 
+        private void checkForStrokeOptions(float x , float y )
+        {
+           if(x > Canvas.GetLeft(Stroke1) && x < Canvas.GetLeft(Stroke1) + 100 && y > Canvas.GetTop(Stroke1) && y < Canvas.GetTop(Stroke1) + 100)
+            {
+                khaledLineImage.StrokeThickness = 5;
+                StokeStackPanel.Visibility = Visibility.Hidden;
+             }
+
+            if (x > Canvas.GetLeft(Stroke2) && x < Canvas.GetLeft(Stroke2) + 100 && y > Canvas.GetTop(Stroke2) && y < Canvas.GetTop(Stroke2) + 100)
+            {
+                khaledLineImage.StrokeThickness = 10;
+                StokeStackPanel.Visibility = Visibility.Hidden;
+
+            }
+            if (x > Canvas.GetLeft(Stroke3) && x < Canvas.GetLeft(Stroke3) + 100 && y > Canvas.GetTop(Stroke3) && y < Canvas.GetTop(Stroke3) + 100)
+            {
+                khaledLineImage.StrokeThickness = 15;
+                StokeStackPanel.Visibility = Visibility.Hidden;
+
+            }
+
+            if (x > Canvas.GetLeft(Stroke4) && x < Canvas.GetLeft(Stroke4) + 100 && y > Canvas.GetTop(Stroke4) && y < Canvas.GetTop(Stroke4) + 100)
+            {
+                khaledLineImage.StrokeThickness = 20;
+                StokeStackPanel.Visibility = Visibility.Hidden;
+
+            }
+        }
+
+        private void saveImage()
+        {
+            var bmpScreenshot = new System.Drawing.Bitmap(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width,
+                               System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height,
+                               System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            // Create a graphics object from the bitmap.
+            var gfxScreenshot = System.Drawing.Graphics.FromImage(bmpScreenshot);
+
+            // Take the screenshot from the upper left corner to the right bottom corner.
+            gfxScreenshot.CopyFromScreen(System.Windows.Forms.SystemInformation.VirtualScreen.X,
+                          System.Windows.Forms.SystemInformation.VirtualScreen.Y,
+                           0,
+                           0,
+                           System.Windows.Forms.SystemInformation.VirtualScreen.Size,
+                           System.Drawing.CopyPixelOperation.SourceCopy);
+
+            DateTime dateTime = DateTime.UtcNow.Date;
+            string myPhotos = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            string path = Path.Combine(myPhotos, "mySavedImage.png"+dateTime.ToString());
+            bmpScreenshot.Save("D:\\Screenshot.png", ImageFormat.Png);
+        }
 
     }
 }

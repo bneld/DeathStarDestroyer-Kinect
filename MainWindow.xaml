@@ -17,7 +17,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-     
+
 
         <Viewbox Name="MainMode" Grid.Row="1" HorizontalAlignment="Center">
 
@@ -85,9 +85,15 @@
                     <Image Name="ColorButton" Source="D:\colors.png" Stretch="UniformToFill" Canvas.Left="751" Canvas.Top="548" RenderTransformOrigin="-0.809,0.529"/>
                     <Image Name="SaveButton" Source="D:\save.png" Stretch="UniformToFill" Canvas.Left="1051" Canvas.Top="548"/>
                     <Image Name="EraserButton" Source="D:\eraser.png" Stretch="UniformToFill" Canvas.Left="1213" Canvas.Top="548"/>
-                    <Image Name="LeftHandPointer" Source="D:\leftHandPointer.png" Stretch="UniformToFill" Canvas.Left="250" Canvas.Top="218"/>
+                    <StackPanel Name="StokeStackPanel" Canvas.Left="901" Canvas.Top="135">
+                        <Image Name="Stroke4" Source="D:\stroke4.png" Stretch="UniformToFill" />
+                        <Image Name="Stroke3" Source="D:\stroke3.png" Stretch="UniformToFill" />
+                        <Image Name="Stroke2" Source="D:\stroke2.png" Stretch="UniformToFill" />
+                        <Image Name="Stroke1" Source="D:\stroke1.png" Stretch="UniformToFill" />
+                    </StackPanel>
 
-                    <Polyline Name="khaledLineImage" Stroke="Red" StrokeThickness="15">
+                    <Image Name="LeftHandPointer" Source="D:\leftHandPointer.png" Stretch="UniformToFill" Canvas.Left="250" Canvas.Top="218"/>
+                    <Polyline Name="khaledLineImage" Stroke="Red" StrokeThickness="10">
                         <Polyline.Effect>
                             <BlurEffect Radius="30" />
                         </Polyline.Effect>
