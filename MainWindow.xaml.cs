@@ -800,8 +800,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
 
                 if (x > playButton.getX() && x < playButton.getX() + playButton.getWidth() && y < playButton.getY() + playButton.getHeight() && y > playButton.getY())
                 {
-                    //Console.WriteLine("Button (X): " + playButton.getX() + " |(Y): " + playButton.getY() + " |(X+W): " + (playButton.getY() + playButton.getWidth()) + " |(Y-H): " + (playButton.getY() - playButton.getHeight()));
-                    //Console.WriteLine("Hand (X): " + x + " | (Y): " + y);
                     return 1; // Game Option 
                 }
                 else if (x > khaledButton.getX() && x < khaledButton.getX() + khaledButton.getWidth() && y < khaledButton.getY() + khaledButton.getHeight() && y > playButton.getY())
@@ -810,7 +808,6 @@ namespace Microsoft.Samples.Kinect.BodyBasics
                 }
                 else if (x > brianButton.getX() && x < brianButton.getX() + brianButton.getWidth() && y < brianButton.getY() + brianButton.getHeight() && y > brianButton.getY())
                 {
-                    //Console.WriteLine("BRIAN's MODE");
                     return 3;
                 }
             }
